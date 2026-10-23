@@ -91,4 +91,4 @@
 - 白平衡其余字节；色调/微调的含义；其他白平衡模式（阴天、白炽灯、色温 K、预设）。
 - 色标取值（`nine:Label`）。
 - 其他 NX Studio 版本、Windows 版和 Capture NX-D 的行为。
-- 高效率 RAW 样本（Q-004）与渲染一致性（Q-016）。
+- 高效率 RAW 样本（Q-004）。渲染一致性见 [render-parity.md](render-parity.md)（Q-016）。

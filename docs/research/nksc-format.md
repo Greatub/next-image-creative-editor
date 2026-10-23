@@ -89,4 +89,4 @@ Active by default on this unedited NEF (17): `nikon::PictureControl`, `nikon::Qu
 - Remaining white-balance bytes; tint/fine-tune semantics; other WB modes (cloudy, incandescent, Kelvin, preset).
 - Color label values (`nine:Label`).
 - Behavior with other NX Studio versions, Windows builds, and Capture NX-D.
-- High Efficiency RAW samples (Q-004) and rendering parity (Q-016).
+- High Efficiency RAW samples (Q-004). Rendering parity: see [render-parity.md](render-parity.md) (Q-016).
