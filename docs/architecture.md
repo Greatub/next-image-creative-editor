@@ -14,7 +14,7 @@ Last updated: 2026-10-23. Status: concept design; technology stack undecided (Q-
 
 | Layer | Meaning | Storage | In NX Studio / Capture NX-D | Interface label |
 |---|---|---|---|---|
-| **L1 · Compatibility** | Adjustments supported by Nikon software: white balance, exposure compensation, Picture Control, and tone/color parameters with a direct mapping | `<photo-directory>/NKSC_PARAM/<filename>.nksc` | Intended to match; requires Q-002 validation | Restorable in NX Studio |
+| **L1 · Compatibility** | Adjustments supported by Nikon software: white balance, exposure compensation, Picture Control, and tone/color parameters with a direct mapping | `<photo-directory>/NKSC_PARAM/<filename>.nksc` | Parameters restore (Q-002 feasible); the rendered look is close, not identical (Q-016) | Restorable in NX Studio |
 | **L2 · Extensions** | NICE-only effects and data: style presets, film profiles, grain, negative conversion, grid preferences, albums, layouts, ID photo parameters, photo status, etc. | NICE sidecar (proposed: `<photo-directory>/NICE_PARAM/<filename>.nice`, JSON) + NICE database | Unavailable, or only approximated | NICE only |
 | **L3 · Baked output** | All L1 + L2 effects rendered into a new file during export | New file in the export directory | Matches the rendered output, as an ordinary image | — |
 
