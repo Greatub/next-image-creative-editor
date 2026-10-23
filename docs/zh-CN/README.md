@@ -28,6 +28,7 @@
 | [data-model.md](../../docs/data-model.md) | 数据模型：照片、NEF+JPEG 对、相册（含智能/临时/嵌套）、相册书、证件照规格、导入导出 | 架构 |
 | [decisions.md](../../docs/decisions.md) | **已定决策记录**（按编号，不可随意推翻） | 项目负责人 |
 | [open-questions.md](../../docs/open-questions.md) | 待决策 / 待验证事项 | 全体 |
+| [research/](research/nksc-format.md) | 验证工作的研究记录（例如 `.nksc` 格式分析）；不是规范 | 全体 |
 | [roadmap.md](../../docs/roadmap.md) | 版本范围：v1（P0）、v1.x（P1）、以后 | 产品 |
 | [glossary.md](../../docs/glossary.md) | 术语表（中英对照、代码标识符） | 全体 |
 | `../../design/tokens.json` | 设计令牌：两套主题颜色、字号、尺寸、动效时长 | 设计 |

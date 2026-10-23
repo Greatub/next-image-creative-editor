@@ -26,6 +26,7 @@ English is the primary language of repository documentation; Simplified Chinese 
 | [docs/data-model.md](docs/data-model.md) | Photos, NEF+JPEG pairs, albums, photo books, ID photo specifications, and jobs | Architecture |
 | [docs/decisions.md](docs/decisions.md) | Numbered decisions; confirmed decisions must not be silently overturned | Project owner |
 | [docs/open-questions.md](docs/open-questions.md) | Pending decisions and validation work | Everyone |
+| [docs/research/](docs/research/nksc-format.md) | Research notes from validation work (e.g. `.nksc` format findings); not specifications | Everyone |
 | [docs/roadmap.md](docs/roadmap.md) | v1 (P0), v1.x (P1), and later scope | Product |
 | [docs/glossary.md](docs/glossary.md) | English and Chinese terminology with code identifiers | Everyone |
 | [design/tokens.json](design/tokens.json) | Two themes, typography, dimensions, and motion tokens | Design |
