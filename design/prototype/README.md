@@ -1,28 +1,32 @@
-# 设计稿（可交互原型）
+# Design prototypes
 
-最后更新：2026-10-23 · 状态：待定稿
+[English](README.md) | [简体中文](../../docs/zh-CN/prototype.md)
 
-## 在线版本
+Last updated: 2026-10-23. Status: pending finalization.
 
-- 画布：<https://claude.ai/artifact/KBSdQUMurHk8Eoqh34f8Gj>（「NICE 界面构想」，四张设计稿）
-- 该链接默认为私有，需要项目负责人通过分享菜单开放后，其他人才能打开。
+The existing prototype interfaces are in Simplified Chinese. They are retained as design references under D-026; the [English specifications](../../docs/product.md) and [bilingual glossary](../../docs/glossary.md) explain the intended behavior and terminology. This documentation update does not establish a product localization policy.
 
-## 本地副本
+## Online version
 
-| 文件 | 页面 |
+- [NICE interface concept canvas](https://claude.ai/artifact/KBSdQUMurHk8Eoqh34f8Gj), containing four designs.
+- The canvas is private by default. The project owner must enable sharing before others can access it. Making this GitHub repository public does not change canvas access.
+
+## Local snapshots
+
+| File | Page |
 |---|---|
-| `Main.dc.html` | 01 浏览 · 来源 / 相册管理 / 照片信息 |
-| `Edit.dc.html` | 02 编辑 · 风格与胶片 / ①–⑤ 调整 / 负片转换 |
-| `Album.dc.html` | 03 相册 · 相册预览 / 版面 / 待选照片 |
-| `Print.dc.html` | 04 打印 · 版式（含证件照）/ 输出 |
-| `canvas.json` | 画布布局索引 |
+| [Main.dc.html](Main.dc.html) | 01 Browse · sources / album management / photo information |
+| [Edit.dc.html](Edit.dc.html) | 02 Edit · styles and film / adjustments ①–⑤ / negative conversion |
+| [Album.dc.html](Album.dc.html) | 03 Album · page thumbnails / layout / available photos |
+| [Print.dc.html](Print.dc.html) | 04 Print · layouts including ID photos / output |
+| [canvas.json](canvas.json) | Canvas layout index |
 
-这些 `.dc.html` 文件依赖设计画布的运行时，**直接用浏览器打开无法运行**；本地副本用于阅读结构、文案、交互状态和令牌用法。
+These `.dc.html` files depend on the design canvas runtime and **do not run by opening them directly in a browser**. Use them to inspect structure, copy, interaction states, and token usage.
 
-## 阅读注意
+## Interpretation
 
-- 设计稿是演示原型：照片用简单风景图形代替，调色用 CSS 滤镜模拟，数据为写死的示例。**不代表实现方式**，实现以 `docs/` 中的规范为准。
-- 每张设计稿各自保存状态，跨页不同步（例如在浏览页加入相册不会反映到其他页）。
-- `[打印机名称]`、`[印厂名称]`、`[第二块硬盘]` 等方括号内容是占位符。
-- 证件照参考线位置是示意值，正式数据见 `docs/data-model.md` 与 Q-008。
-- 设计稿与 `docs/` 不一致时，以 `docs/decisions.md` 和规范文档为准，并在 `docs/open-questions.md` 记录差异。
+- These are demonstration prototypes: photos are landscape illustrations, color adjustments use CSS filters, and data is hardcoded. **They do not prescribe implementation.** Follow the specifications in `docs/`.
+- Each page stores its own state; there is no cross-page synchronization. Adding a photo to an album on Browse will not update other pages.
+- Bracketed Chinese text such as `[打印机名称]` (printer name), `[印厂名称]` (print provider), and `[第二块硬盘]` (second drive) is placeholder content.
+- ID photo guide positions are illustrative; production specifications require verified sources under [Q-008](../../docs/open-questions.md) and the [data model](../../docs/data-model.md).
+- If a prototype differs from the documentation, follow [decisions](../../docs/decisions.md) and the specifications, and record the discrepancy in [open questions](../../docs/open-questions.md).

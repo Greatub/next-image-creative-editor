@@ -1,121 +1,123 @@
-# 产品需求（PRD）
+# Product requirements (PRD)
 
-最后更新：2026-10-23 · 状态：待定稿
+[English](product.md) | [简体中文](zh-CN/product.md)
 
-## 1. 定位
+Last updated: 2026-10-23. Status: pending finalization.
 
-- **名称**：NICE（Next Image Creative Editor）
-- **目标用户**：尼康相机用户（含使用 ES-2 等适配器翻拍底片的用户）。不以其他品牌 RAW 为目标。
-- **核心价值**
-  1. 编辑参数与原文件分离，原文件永不改动。
-  2. 尼康兼容参数写入 `.nksc`，NX Studio / Capture NX-D 可直接读取（参数分层，见 `architecture.md`）。
-  3. 从选片、编辑、相册编排到打印输出，在一个软件里完成。
-- **界面原则**：一个功能只有一个位置；四页骨架相同、切换无抖动；照片区保持干净；导航即工作流。
+## 1. Positioning
 
-## 2. 信息架构
+- **Name:** NICE (Next Image Creative Editor).
+- **Users:** Nikon photographers, including film digitization with adapters such as the ES-2. Dedicated support for other brands' RAW formats is out of scope.
+- **Core value:**
+  1. Editing parameters remain separate; original files are never modified.
+  2. Nikon-compatible parameters go into `.nksc` for NX Studio / Capture NX-D, subject to interoperability validation (see [architecture](architecture.md) and Q-002).
+  3. Culling, editing, photo book layout, and printing in one application.
+- **Interface principles:** one location per feature; one stable shell across four pages; a clean photo stage; navigation follows the workflow.
 
-顶部导航四个页面，顺序即工作流：
+## 2. Information architecture
 
-| 页面 | 职责 | 左栏 | 中间 | 右栏 | 标题栏主操作 |
+The top navigation follows the workflow:
+
+| Page | Purpose | Left panel | Center | Right panel | Header primary action |
 |---|---|---|---|---|---|
-| 浏览 | 导入、选择来源、选片、归类 | 导入 · 搜索 · 文件夹 · 相册管理 · 筛选与排序 | 大图 | 照片信息 | 导出… |
-| 编辑 | 修图 | 风格 / 胶片 两个标签 · 参数 | 编辑预览 | 直方图 · 调整 / 负片转换 两个标签 | 导出… |
-| 相册 | 把一个相册排版成书 | 相册预览（页面缩略图） | 当前跨页 | 模板 · 参考线 · 版面设置 · 输出前检查 | 导出打印稿 |
-| 打印 | 用打印机输出 | 版式（含证件照） | 页面预览 | 输出（打印机 / PDF · 色彩管理 · 份数 · 汇总） | 打印 / 存为 PDF |
+| Browse | Import, source selection, culling, organization | Import · search · folders · album management · filters and sorting | Large photo | Photo information | Export… |
+| Edit | Photo editing | Style / Film tabs · parameters | Edit preview | Histogram · Adjustments / Negative conversion tabs | Export… |
+| Album | Lay out an album as a photo book | Page thumbnails | Current spread | Templates · guides · layout settings · preflight | Export print files |
+| Print | Printer output | Layout, including ID photos | Page preview | Printer / PDF · color management · copies · summary | Print / Save as PDF |
 
-四页共用：标题栏（撤销、重做、主操作、设置）、底栏照片条、照片区右下角的显示方式控件。
+Shared: header (undo, redo, primary action, Settings), footer filmstrip, and bottom-right view-mode controls.
 
-## 3. 功能需求
+## 3. Functional requirements
 
-优先级：P0 = v1 必须；P1 = v1.x；状态「已画」= 已体现在 `design/prototype/` 设计稿。
+P0 = required for v1; P1 = v1.x. **Designed** means shown in the [design prototypes](../design/prototype/README.md), not implemented.
 
-### 3.1 全局（GL）
+### 3.1 Global (GL)
 
-| 编号 | 需求 | 优先级 | 状态 |
+| ID | Requirement | Priority | Design status |
 |---|---|---|---|
-| GL-01 | 顶部导航：浏览 / 编辑 / 相册 / 打印 | P0 | 已画 |
-| GL-02 | 标题栏统一：Logo · 导航 · 撤销 · 重做 · 本页主操作（固定宽度 ≥112px）· 设置 ⚙ | P0 | 已画 |
-| GL-03 | 主题：深色 / 中性灰，在设置 ⚙ 中切换 | P0 | 已画 |
-| GL-04 | 显示方式：标准（全部栏固定）/ 专注（仅底栏固定）/ 沉浸（全部自动隐藏）；与窗口 / 全屏独立组合 | P0 | 已画 |
-| GL-05 | 显示方式控件浮动在照片区右下角，鼠标移动时出现，静止 2 秒后淡出；沉浸模式下鼠标指针一起隐藏 | P0 | 已画 |
-| GL-06 | 自动隐藏的栏：鼠标移到窗口边缘时浮出，离开后收回 | P0 | 已画 |
-| GL-07 | 底栏照片条：四页通用；单击 / Ctrl⌘ 多选 / Shift 连选；「展开」切换为网格 | P0 | 已画 |
-| GL-08 | 底栏左侧只显示当前来源（文件夹或相册），不可点击；来源只在浏览页选择 | P0 | 已画 |
-| GL-09 | 导出对话框：格式（JPEG / TIFF 16 位 / HEIF）、尺寸、色彩空间、输出锐化、元数据、文件名规则 | P0 | 已画 |
-| GL-10 | 照片区缩放：双击在「适合」与 100% 之间切换，滚轮缩放；放大时左下角临时提示 | P0 | 已画（双击） |
-| GL-11 | 设置 ⚙ 的完整偏好：参数兼容层、显示器 ICC、默认目录、快捷键 | P1 | — |
-| GL-12 | 快捷键：Tab 轮换显示方式、F 全屏、Esc 退出全屏并回到标准 | P1 | — |
+| GL-01 | Top navigation: Browse / Edit / Album / Print | P0 | Designed |
+| GL-02 | Shared header: logo · navigation · undo · redo · page primary action (fixed width ≥112px) · Settings ⚙ | P0 | Designed |
+| GL-03 | Dark / Neutral Gray themes, switched in Settings | P0 | Designed |
+| GL-04 | Standard (all panels fixed) / Focus (only footer fixed) / Immersive (all auto-hide), independent of window / fullscreen | P0 | Designed |
+| GL-05 | Bottom-right floating view controls appear on mouse movement, fade after 2 seconds idle; hide the pointer too in Immersive | P0 | Designed |
+| GL-06 | Auto-hidden panels float out when the pointer reaches the window edge and retract on leaving | P0 | Designed |
+| GL-07 | Shared footer filmstrip; click / Ctrl/⌘ multiselect / Shift range selection; Expand switches to a grid | P0 | Designed |
+| GL-08 | Footer source indicator displays the current folder / album and is not clickable; choose sources only on Browse | P0 | Designed |
+| GL-09 | Export dialog: JPEG / 16-bit TIFF / HEIF, dimensions, color space, sharpening, metadata, filename rules | P0 | Designed |
+| GL-10 | Double-click toggles Fit / 100%; wheel zoom; temporary bottom-left zoom indicator | P0 | Designed: double-click |
+| GL-11 | Complete Settings: compatibility layer, monitor ICC, default directory, shortcuts | P1 | — |
+| GL-12 | Shortcuts: Tab cycles view modes, F fullscreen, Esc exits fullscreen and returns to Standard | P1 | — |
 
-### 3.2 浏览（BR）
+### 3.2 Browse (BR)
 
-| 编号 | 需求 | 优先级 | 状态 |
+| ID | Requirement | Priority | Design status |
 |---|---|---|---|
-| BR-01 | 导入：检测存储卡，导入对话框（范围、存放位置、文件名、NEF+JPEG 处理、同时备份、加入相册）；只复制不改动卡上文件 | P0 | 已画 |
-| BR-02 | 搜索当前来源中的文件名 | P0 | 已画 |
-| BR-03 | 文件夹列表；点击即切换来源 | P0 | 已画 |
-| BR-04 | 相册管理：相册树（嵌套、智能相册、临时相册）、新建、点击切换来源 | P0 | 已画 |
-| BR-05 | 照片归类：底栏照片拖到相册上加入；或选中后点相册行的 ＋ | P0 | 已画 |
-| BR-06 | 当前相册属性：写入照片关键字开关（显示层级路径）、移出已选照片、智能规则说明 | P0 | 已画 |
-| BR-07 | 筛选与排序：星级、只看已编辑、隐藏已排除；按拍摄时间 / 评分排序；显示：NEF+JPEG 叠加为一张 | P0 | 已画 |
-| BR-08 | 照片信息：文件名、尺寸、NEF/JPEG 切换、评分、色标、排除、编辑状态（一行）、所属相册（只读）、拍摄参数 | P0 | 已画 |
-| BR-09 | 评分 / 色标 / 排除可修改；快捷键 1–5 / 0 / X | P0 | 已画（点击） |
-| BR-10 | 两张照片并排对比 | P1 | — |
-| BR-11 | IPTC 元数据编辑（标题、说明、版权）——相册和打印的图注来源 | P1 | — |
-| BR-12 | 照片状态标记（未处理 / 修图中 / 已完成） | 待定 | — |
+| BR-01 | Detect memory cards; import dialog for scope, destination, naming, NEF+JPEG handling, simultaneous backup, and album membership; copy only, never modify card files | P0 | Designed |
+| BR-02 | Search filenames in the current source | P0 | Designed |
+| BR-03 | Folder list; click to switch source | P0 | Designed |
+| BR-04 | Album tree with nesting, smart and temporary albums; create albums; click to switch source | P0 | Designed |
+| BR-05 | Add filmstrip photos to albums by dragging or selecting photos and clicking the album row's ＋ | P0 | Designed |
+| BR-06 | Current album properties: Write photo keywords toggle with hierarchy path, remove selected photos, smart-rule explanation | P0 | Designed |
+| BR-07 | Filter by stars, edited only, hide rejected; sort by capture time / rating; Stack NEF+JPEG display option | P0 | Designed |
+| BR-08 | Photo information: filename, dimensions, NEF/JPEG switch, rating, color label, rejection, single-line edit status, read-only album membership, capture metadata | P0 | Designed |
+| BR-09 | Editable rating / color label / rejection; shortcuts 1–5 / 0 / X | P0 | Designed: click |
+| BR-10 | Side-by-side comparison of two photos | P1 | — |
+| BR-11 | IPTC title, description, and copyright editing; source for album / print captions | P1 | — |
+| BR-12 | Photo status: Unprocessed / Editing / Complete | Pending | — |
 
-### 3.3 编辑（ED）
+### 3.3 Edit (ED)
 
-| 编号 | 需求 | 优先级 | 状态 |
+| ID | Requirement | Priority | Design status |
 |---|---|---|---|
-| ED-01 | 左栏「风格」标签：12 种风格滤镜 + 强度 | P0 | 已画 |
-| ED-02 | 左栏「胶片」标签：胶片档案（人像负片、风景负片、日常负片、黑白负片、反转片等）+ 颗粒 | P0 | 已画 |
-| ED-03 | 参数卡片：参数文件路径与自动保存状态、已修改项列表、复制到所选、存为预设 | P0 | 已画 |
-| ED-04 | 右栏顶部固定直方图 + 前 / 后对比 + 暗部 / 高光溢出警告（点击在照片上标出） | P0 | 已画 |
-| ED-05 | 右栏「调整」标签按工作流编号：① 几何（镜头校正、拉直、裁剪比例、网格线）② 曝光与白平衡（白平衡预设、吸管、优化校准、曝光、色温、色调）③ 色调 ④ 色彩 ⑤ 细节 | P0 | 已画 |
-| ED-06 | 网格线：无 / 三分法 / 黄金比 / 细网格 | P0 | 已画 |
-| ED-07 | 右栏「负片转换」标签：标记为底片翻拍、胶片类型（彩色负片 / 黑白负片 / 反转片）、片基取样（整卷共用）、密度、三组色彩平衡、除尘、自动裁掉片边、查看原始底片、自动色阶、同步到整卷 | P0 | 已画 |
-| ED-08 | 分区复位、双击滑块复位单项 | P0 | 已画 |
-| ED-09 | 「我的预设」分组；复位全部 | P1 | — |
-| ED-10 | 历史记录与快照 | P1 | — |
-| ED-11 | 去污点 / 局部修补 | P1 | — |
-| ED-12 | 编辑工作流模板（自定义启用的步骤和默认值） | 待定 | — |
+| ED-01 | Left Style tab: 12 style presets with strength | P0 | Designed |
+| ED-02 | Left Film tab: film profiles (portrait, landscape, everyday, black-and-white negatives, reversal film, etc.) and grain | P0 | Designed |
+| ED-03 | Parameter card: file path, autosave state, changed items, Copy to selected, Save as preset | P0 | Designed |
+| ED-04 | Fixed histogram at top right, before / after comparison, clickable shadow / highlight clipping overlays | P0 | Designed |
+| ED-05 | Right Adjustments tab: ① Geometry (lens corrections, straighten, crop ratio, grids) ② Exposure and white balance (presets, eyedropper, Picture Control, exposure, temperature, tint) ③ Tone ④ Color ⑤ Detail | P0 | Designed |
+| ED-06 | Grid: none / thirds / golden ratio / fine | P0 | Designed |
+| ED-07 | Right Negative conversion tab: mark as film scan, type (color negative / B&W negative / reversal), film-base sampling shared by roll, density, three color-balance pairs, dust removal, auto-crop borders, view original negative, auto levels, Sync to roll | P0 | Designed |
+| ED-08 | Reset each section; double-click a slider to reset one value | P0 | Designed |
+| ED-09 | My presets group; Reset all | P1 | — |
+| ED-10 | History and snapshots | P1 | — |
+| ED-11 | Spot removal / local retouching | P1 | — |
+| ED-12 | Editing workflow templates with configurable steps and defaults | Pending | — |
 
-### 3.4 相册（AL）
+### 3.4 Album (AL)
 
-| 编号 | 需求 | 优先级 | 状态 |
+| ID | Requirement | Priority | Design status |
 |---|---|---|---|
-| AL-01 | 相册预览：封面、各跨页、封底缩略图；点击切换；增加 / 删除跨页（封面封底不可删）；拖动调整页序 | P0 | 已画（拖动为说明） |
-| AL-02 | 中间显示当前跨页；出血线 / 裁切线 / 安全线 / 装订中缝 / 裁切后预览可开关 | P0 | 已画 |
-| AL-03 | 底栏为当前相册的待选照片（未放入版面）；「显示已用照片」开关并标注所在页 | P0 | 已画 |
-| AL-04 | 放置照片：拖入照片框，或选中后点击空框；照片框可移出 | P0 | 已画 |
-| AL-05 | 模板：内置模板 + 自定义模板入口；切换模板保留可对应的照片 | P0 | 已画（3 个内置） |
-| AL-06 | 图注直接在版面上编辑 | P0 | 已画 |
-| AL-07 | 成品尺寸：20×20 / 21×28 竖 / 28×21 横 / 30×30 cm，版面与参考线随之重算 | P0 | 已画 |
-| AL-08 | 输出前检查：空照片框、满版出血、装订中缝、有效分辨率、文字安全区 | P0 | 已画 |
-| AL-09 | 导出打印稿：印厂 PDF（PDF/X-4）/ 逐页 JPEG / 逐页 TIFF、裁切标记、出血、色彩（RGB+ICC / CMYK）、印厂预设 | P0 | 已画 |
-| AL-10 | 只做标准文件输出，不对接在线照片书服务商 | — | 决策 D-014 |
-| AL-11 | 模板系统完整版：约 40 个页面模板 / 3–4 个套系、模板编辑器、模板导入导出 | P1 | — |
-| AL-12 | 幻灯片放映（相册页「放映」视图） | 以后 | 决策 D-020 |
+| AL-01 | Front cover, spread, and back cover thumbnails; click to switch; add / delete spreads (covers cannot be deleted); drag to reorder | P0 | Designed; drag described only |
+| AL-02 | Current spread in the center; toggles for bleed / trim / safe area / gutter / trimmed preview | P0 | Designed |
+| AL-03 | Filmstrip shows available photos not yet placed; Show used photos toggle with page labels | P0 | Designed |
+| AL-04 | Place photos by dragging into a frame or selecting then clicking an empty frame; remove placed photos from frames | P0 | Designed |
+| AL-05 | Built-in templates and a custom-template entry point; preserve corresponding photos when switching templates | P0 | Designed: 3 built-in |
+| AL-06 | Edit captions directly in the layout | P0 | Designed |
+| AL-07 | Finished size: 20×20 / 21×28 portrait / 28×21 landscape / 30×30 cm; recalculate layouts and guides | P0 | Designed |
+| AL-08 | Preflight: empty frames, edge-to-edge bleed, gutter, effective resolution, text safe area | P0 | Designed |
+| AL-09 | Export print files: print-ready PDF/X-4 / per-page JPEG / TIFF, crop marks, bleed, RGB+ICC / CMYK, print-provider presets | P0 | Designed |
+| AL-10 | Standard file output only; no online photo book provider integration | — | D-014 |
+| AL-11 | Full template system: about 40 page templates / 3–4 collections, editor, import/export | P1 | — |
+| AL-12 | Slideshows through an Album Presentation view | Later | D-020 |
 
-### 3.5 打印（PR）
+### 3.5 Print (PR)
 
-| 编号 | 需求 | 优先级 | 状态 |
+| ID | Requirement | Priority | Design status |
 |---|---|---|---|
-| PR-01 | 版式：纸张尺寸、方向、每页布局（单张 / 2 / 4 / 索引印样 / 证件照）、适合方式、页边距、打印信息 | P0 | 已画 |
-| PR-02 | 打印内容 = 底栏选中的照片 | P0 | 已画 |
-| PR-03 | 输出：打印机（含「存为 PDF」）、纸张类型、色彩管理（ICC + 可感知 / 相对比色）、份数、汇总 | P0 | 已画 |
-| PR-04 | 软打样：按打印机 ICC 模拟打印效果 | P0 | 已画 |
-| PR-05 | 证件照：国际常用规格（申根/英国/日本 35×45、美国 2×2 in、中国签证 33×48、加拿大 50×70 等）；背景（白 / 浅蓝 / 保持原图）；自动排满相纸并画裁切线 | P0 | 已画 |
-| PR-06 | 证件照人像调整：单张调整视图，头顶线 / 下巴线 / 眼睛区间 / 中轴线；缩放、上下位置、自动对齐、对齐状态提示；整版预览 | P0 | 已画 |
-| PR-07 | 证件照电子版导出（按规格的像素与文件大小） | P1 | — |
-| PR-08 | 证件照背景替换（本机人像分割） | P1 | — |
+| PR-01 | Paper, orientation, per-page layout (single / 2 / 4 / contact sheet / ID photos), fit mode, margins, printed information | P0 | Designed |
+| PR-02 | Print content equals filmstrip selection | P0 | Designed |
+| PR-03 | Printer including Save as PDF, paper type, color management (ICC + perceptual / relative colorimetric), copies, summary | P0 | Designed |
+| PR-04 | Soft proof print appearance using printer ICC | P0 | Designed |
+| PR-05 | Common international ID specifications (concept examples: Schengen/UK/Japan 35×45 mm, US 2×2 in, China visa 33×48 mm, Canada 50×70 mm); white / light blue / original background; auto-fill paper and draw crop marks. Verify actual specifications under Q-008 | P0 | Designed |
+| PR-06 | ID portrait adjustment: individual view with top-of-head / chin / eye band / center guides; zoom, vertical position, auto alignment, alignment status; full-sheet preview | P0 | Designed |
+| PR-07 | Digital ID photo export with required pixels and file size | P1 | — |
+| PR-08 | ID background replacement using local portrait segmentation | P1 | — |
 
-## 4. 不做（本版）
+## 4. Out of scope for this version
 
-- 幻灯片（D-020，计划作为相册页的「放映」视图回归）
-- 在线照片书服务商直连下单（D-014）
-- 非尼康 RAW 的专门适配（D-004）
+- Slideshows (D-020; planned as Album's Presentation view).
+- Direct ordering from online photo book providers (D-014).
+- Dedicated RAW support for non-Nikon brands (D-004).
 
-## 5. 验收要点
+## 5. Acceptance
 
-见 `AGENTS.md` 第 6 节自查清单，以及 `ui-spec.md` 的防抖动清单。
+Use [AGENTS.md §6](../AGENTS.md#6-acceptance-checklist) and the layout-stability checklist in [ui-spec.md](ui-spec.md).

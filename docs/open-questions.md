@@ -1,32 +1,42 @@
-# 待决策 / 待验证
+# Open questions and validation
 
-格式：编号 · 问题 · 为什么重要 · 当前状态 / 建议。解决后把结论移入 `decisions.md`，此处标注「已解决 → D-xxx」。
+[English](open-questions.md) | [简体中文](zh-CN/open-questions.md)
 
-## 技术选型
+Last updated: 2026-10-23.
 
-| 编号 | 问题 | 为什么重要 | 状态 / 建议 |
+Record the ID, question, why it matters, and current status / recommendation. When resolved, record the conclusion in [decisions.md](decisions.md) and mark this entry “Resolved → D-xxx”.
+
+## Technology
+
+| ID | Question | Why it matters | Status / recommendation |
 |---|---|---|---|
-| Q-001 | 桌面技术栈（原生 Swift + C++/Win，Qt，Electron/Tauri + 原生图像核心等） | 决定性能、色彩管理、打印与 RAW 解码集成方式 | 未定。图像管线需 GPU 加速与 16 位色深，建议「原生图像核心 + 跨平台界面层」方向评估 |
-| Q-004 | NEF（含高效率 RAW）解码方案与授权 | 没有解码就没有产品 | 未定。需确认能否获得尼康 SDK 及授权条款，或评估第三方解码库对 HE/HE* 的支持 |
+| Q-001 | Desktop stack: native Swift + C++/Windows, Qt, Electron/Tauri + native imaging core, etc. | Determines performance, color management, printing, and RAW integration | Undecided. The image pipeline needs GPU acceleration and 16-bit depth; evaluate a native imaging core with a cross-platform UI |
+| Q-004 | NEF decoding, including High Efficiency RAW, and licensing | The product depends on decoding support | Undecided. Investigate Nikon SDK access / license terms, or third-party library support for HE/HE* |
 
-## 尼康兼容性（开发前必须验证）
+## Nikon interoperability: validate before development
 
-| 编号 | 问题 | 为什么重要 | 状态 / 建议 |
+| ID | Question | Why it matters | Status / recommendation |
 |---|---|---|---|
-| Q-002 | `.nksc` 能否由第三方可靠读写，NX Studio 是否接受 | 核心卖点 | 未验证。格式未公开，需做读写原型并在 NX Studio 中回读 |
-| Q-003 | `.nksc` 写入未知数据的后果；L2 效果能否降级为 L1 近似（如负片用反向曲线） | 决定 L2 存放与降级策略 | 未验证。验证前 L2 一律单独存放 |
-| Q-005 | 评分 / 色标存放位置及与 NX Studio 互通 | 选片结果要在两个软件间一致 | 未验证 |
-| Q-006 | NX Studio 是否读取 NICE 写入的 XMP/IPTC 层级关键字 | 相册写入关键字的价值 | 未验证 |
-| Q-007 | 自定义优化校准（NP3）导出可行性 | 让 NICE 风格回到相机，差异化功能 | 未验证，非 v1 必需 |
+| Q-002 | Can third parties reliably read/write `.nksc`, and will NX Studio accept it? | Core value proposition | Unverified. The format is not public; build a read/write prototype and reopen it in NX Studio |
+| Q-003 | What happens with unknown `.nksc` data? Can L2 effects be approximated in L1, such as negative inversion with reversed curves? | Determines L2 storage and fallback strategy | Unverified. Keep L2 separate until validated |
+| Q-005 | Where to store ratings / color labels, and how to interoperate with NX Studio? | Culling results must agree across both applications | Unverified |
+| Q-006 | Does NX Studio read hierarchical XMP/IPTC keywords written by NICE? | Determines the value of album-to-keyword writing | Unverified |
+| Q-007 | Is custom Picture Control NP3 export feasible? | Could bring NICE looks back to cameras | Unverified; not required for v1 |
 
-## 产品与内容
+## Product and content
 
-| 编号 | 问题 | 为什么重要 | 状态 / 建议 |
+| ID | Question | Why it matters | Status / recommendation |
 |---|---|---|---|
-| Q-008 | 证件照规格数据来源与维护（各国官方要求、核对日期、更新机制） | 规格错误会导致用户被拒 | 需建立规格数据表，每条带来源链接与核对日期；界面不写「保证合规」 |
-| Q-009 | 胶片档案是否使用真实胶片型号命名 | 商标风险 | 当前设计稿用特性命名（人像负片 160 等）；如要用真实型号需法律确认 |
-| Q-010 | 相册书 PDF 嵌入字体的授权 | 输出合规 | 内置模板只用可自由嵌入的开源字体（如思源黑体 / 宋体）；自定义模板输出前检查嵌入许可 |
-| Q-011 | 界面强调色 `#F2C230`（黄）与应用图标配色（`#1E2732` 深蓝灰、`#7E858C` 灰、`#FAF9F6` 米白）是否统一 | 品牌一致性 | 待品牌确认；令牌中暂保留黄色强调色，图标色已录入 `design/tokens.json` 的 `brand` 组 |
-| Q-012 | 照片状态标记（未处理 / 修图中 / 已完成）、编辑工作流模板是否进入 v1 | 范围 | 曾讨论，未确认；当前列为「待定」 |
-| Q-013 | 设置 ⚙ 中「参数兼容层」开关的具体含义（例如：只写 L1、禁用 L2 效果） | 给只用 NX Studio 的用户一个安全模式 | 待设计 |
-| Q-014 | 多张照片同时编辑（同步调整）与「复制到所选」的关系 | 避免两个入口做同一件事 | 待设计；倾向只保留「复制到所选」 |
+| Q-008 | Sources and maintenance for ID photo specifications: official requirements, check dates, update process | Wrong specifications can cause rejection | Build a specification table with source links and verification dates; do not claim guaranteed compliance |
+| Q-009 | Should film profiles use real film stock names? | Trademark considerations | Prototypes use descriptive names such as Portrait Negative 160; real stock names require legal confirmation |
+| Q-010 | Font embedding licenses for photo book PDFs | Output licensing | Use freely embeddable open-source fonts such as Source Han Sans / Serif in built-in templates; check custom-template embedding rights before output |
+| Q-011 | Should the yellow accent `#F2C230` align with icon colors `#1E2732`, `#7E858C`, and `#FAF9F6`? | Brand consistency | Pending brand confirmation. Keep yellow for now; icon colors are in the `brand` token group |
+| Q-012 | Should photo status (Unprocessed / Editing / Complete) and editing workflow templates enter v1? | Scope | Discussed but not confirmed; pending |
+| Q-013 | What exactly does the Settings compatibility-layer switch mean, such as L1-only writing or disabling L2 effects? | A safe mode for NX Studio-only users | Design pending |
+| Q-014 | How does simultaneous multi-photo editing relate to Copy to selected? | Avoid duplicate entry points | Design pending; prefer retaining only Copy to selected |
+
+## Documentation language
+
+| ID | Question | Why it matters | Status / recommendation |
+|---|---|---|---|
+| Q-015 | The English-first repository request conflicts with D-025's Chinese documentation rule | Establish the public repository's primary language while preserving decision history | Resolved → D-026; the project owner explicitly requested English first, Chinese second on 2026-10-23 |
