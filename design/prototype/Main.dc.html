@@ -1,0 +1,792 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>NICE 浏览 · 来源与选片</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#f2c230}a:hover{color:#ffd95a}
+button,input{font:inherit;color:inherit}
+</style>
+</helmet>
+<div onMouseMove="{{onMove}}" style="width: 100%; height: 100vh; min-height: 720px; position: relative; overflow: hidden; display: flex; flex-direction: column; cursor: {{cursor}}; background: {{c.bg}}; color: {{c.text}}; font-family: Inter, 'Noto Sans SC', system-ui, sans-serif; font-size: 13px">
+
+  <header onMouseLeave="{{T.leave}}" style="position: {{T.pos}}; top: 0; left: 0; right: 0; z-index: 30; transform: {{T.tf}}; transition: transform 160ms ease; box-shadow: {{T.shadow}}; height: 48px; flex: none; box-sizing: border-box; display: flex; align-items: center; gap: 16px; padding: 0 12px 0 16px; background: {{c.panel}}; border-bottom: 1px solid {{c.line}}">
+    <div style="display: flex; align-items: center; gap: 8px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f2c230" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 3l3 7M21 12l-7 3M12 21l-3-7M3 12l7-3"></path></svg>
+      <span style="font-weight: 700; letter-spacing: 0.12em; font-size: 15px">NICE</span>
+    </div>
+    <nav aria-label="主视图" style="display: flex; gap: 2px; background: {{c.well}}; padding: 3px; border-radius: 8px">
+      <a href="Main.dc.html" aria-current="page" style="padding: 6px 16px; border-radius: 6px; background: #f2c230; color: #141518; text-decoration: none; font-weight: 600">浏览</a>
+      <a href="Edit.dc.html" style="padding: 6px 16px; border-radius: 6px; color: {{c.sub}}; text-decoration: none">编辑</a>
+      <a href="Album.dc.html" style="padding: 6px 16px; border-radius: 6px; color: {{c.sub}}; text-decoration: none">相册</a>
+      <a href="Print.dc.html" style="padding: 6px 16px; border-radius: 6px; color: {{c.sub}}; text-decoration: none">打印</a>
+    </nav>
+    <div style="flex: 1"></div>
+    <button aria-label="撤销" style="width: 34px; height: 32px; border: 1px solid {{c.ctl}}; border-radius: 6px; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 14L4 9l5-5"></path><path d="M4 9h11a5 5 0 0 1 0 10h-3"></path></svg>
+    </button>
+    <button aria-label="重做" style="width: 34px; height: 32px; border: 1px solid {{c.ctl}}; border-radius: 6px; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 14l5-5-5-5"></path><path d="M20 9H9a5 5 0 0 0 0 10h3"></path></svg>
+    </button>
+    <button onClick="{{openExport}}" style="min-width: 112px; height: 32px; padding: 0 14px; border: 0; border-radius: 6px; background: #f2c230; color: #141518; font-weight: 600; cursor: pointer">导出…</button>
+    <div style="position: relative">
+      <button aria-label="设置" aria-expanded="{{gearExpanded}}" onClick="{{toggleGear}}" style="width: 34px; height: 32px; border: 0; border-radius: 6px; background: {{gearBg}}; cursor: pointer; display: flex; align-items: center; justify-content: center">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9L7 7M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg>
+      </button>
+      <sc-if value="{{gearOpen}}" hint-placeholder-val="{{ false }}">
+        <div role="dialog" aria-label="设置" style="position: absolute; right: 0; top: calc(100% + 8px); width: 240px; padding: 12px; box-sizing: border-box; background: {{c.panel}}; border: 1px solid {{c.line}}; border-radius: 10px; box-shadow: 0 12px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 8px; z-index: 50">
+          <span style="font-size: 11px; letter-spacing: 0.08em; color: {{c.dim}}">界面主题</span>
+          <div role="group" aria-label="界面主题" style="display: flex; gap: 2px; background: {{c.well}}; padding: 3px; border-radius: 8px">
+            <sc-for list="{{themes}}" as="t" hint-placeholder-count="2">
+              <button aria-pressed="{{t.pressed}}" onClick="{{t.pick}}" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 28px; border: 0; border-radius: 6px; background: {{t.bg}}; cursor: pointer">
+                <span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 5px; background: {{t.swatch}}; border: 1px solid #9a9a9a"></span>{{t.label}}
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </header>
+  <sc-if value="{{T.hot}}" hint-placeholder-val="{{ false }}">
+    <div aria-hidden="true" onMouseEnter="{{T.enter}}" style="position: absolute; top: 0; left: 0; right: 0; height: 6px; z-index: 29"></div>
+  </sc-if>
+
+  <div style="flex: 1; min-height: 0; display: flex; position: relative">
+
+    <aside aria-label="来源与筛选" onMouseLeave="{{L.leave}}" style="position: {{L.pos}}; top: 0; bottom: 0; left: 0; z-index: 20; width: 300px; flex: none; box-sizing: border-box; transform: {{L.tf}}; transition: transform 160ms ease; box-shadow: {{L.shadow}}; background: {{c.panel}}; border-right: 1px solid {{c.line}}; overflow-y: auto; padding: 14px 8px 16px; display: flex; flex-direction: column; gap: 2px">
+      <div style="display: flex; align-items: center; gap: 8px; background: {{c.well}}; border: 1px solid {{c.line}}; border-radius: 6px; padding: 0 10px; height: 32px; margin: 0 4px 6px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="color: {{c.muted}}"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+        <input type="search" aria-label="在当前来源中搜索文件名" placeholder="搜索文件名，如 0421" value="{{q}}" onChange="{{setQ}}" style="background: transparent; border: 0; outline: none; flex: 1; font-size: 13px; min-width: 0">
+      </div>
+
+      <div style="margin: 0 4px 4px; padding: 10px 12px; border-radius: 8px; background: {{c.well}}; border: 1px solid {{c.line}}; display: flex; align-items: center; gap: 10px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f2c230" stroke-width="1.8" aria-hidden="true" style="flex: none"><path d="M6 3h9l4 4v14H6z"></path><path d="M9 3v4M12 3v4M15 3v4"></path></svg>
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+          <span>存储卡 · Z 8</span>
+          <span style="font-size: 12px; color: {{c.muted}}">发现 412 张新照片</span>
+        </div>
+        <button onClick="{{openImport}}" style="min-height: 30px; padding: 0 12px; border: 0; border-radius: 6px; background: #f2c230; color: #141518; font-weight: 600; cursor: pointer">导入…</button>
+      </div>
+      <div style="padding: 10px 10px 6px; font-size: 11px; letter-spacing: 0.08em; color: {{c.dim}}">文件夹</div>
+      <sc-for list="{{folderRows}}" as="f" hint-placeholder-count="3">
+        <button aria-pressed="{{f.pressed}}" onClick="{{f.pick}}" style="display: flex; align-items: center; gap: 8px; width: 100%; min-height: 32px; border: 0; border-radius: 6px; cursor: pointer; padding: 0 10px; background: {{f.bg}}; color: {{f.fg}}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 6h6l2 2h10v11H3z"></path></svg>
+          <span style="flex: 1; text-align: left">{{f.name}}</span>
+          <span style="color: {{c.dim}}; font-size: 12px">{{f.count}}</span>
+        </button>
+      </sc-for>
+
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 4px 6px 10px">
+        <span style="font-size: 11px; letter-spacing: 0.08em; color: {{c.dim}}">相册</span>
+        <div style="display: flex; gap: 4px">
+          <button style="min-height: 26px; padding: 0 8px; border: 1px solid {{c.ctl}}; border-radius: 6px; background: transparent; cursor: pointer; font-size: 12px">+ 相册</button>
+          <button style="min-height: 26px; padding: 0 8px; border: 1px solid {{c.ctl}}; border-radius: 6px; background: transparent; cursor: pointer; font-size: 12px">+ 智能相册</button>
+        </div>
+      </div>
+      <sc-for list="{{albumTree}}" as="a" hint-placeholder-count="8">
+        <div onDragOver="{{a.over}}" onDrop="{{a.drop}}" style="display: flex; align-items: center; gap: 2px; border-radius: 6px; background: {{a.bg}}">
+          <button aria-pressed="{{a.pressed}}" onClick="{{a.pick}}" style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; min-height: 32px; border: 0; border-radius: 6px; cursor: pointer; padding-right: 6px; padding-left: {{a.pad}}px; background: transparent; color: {{a.fg}}">
+            <sc-if value="{{a.isSmart}}" hint-placeholder-val="{{ false }}">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3l2.2 5.6L20 9.3l-4.5 3.9 1.4 5.8L12 16l-4.9 3 1.4-5.8L4 9.3l5.8-.7z"></path></svg>
+            </sc-if>
+            <sc-if value="{{a.isTemp}}" hint-placeholder-val="{{ false }}">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 8h16l-1.5 12h-13z"></path><path d="M9 8V5h6v3"></path></svg>
+            </sc-if>
+            <sc-if value="{{a.isAlbum}}" hint-placeholder-val="{{ true }}">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="7" width="14" height="13" rx="1.5"></rect><path d="M7 4h12a2 2 0 0 1 2 2v11"></path></svg>
+            </sc-if>
+            <span style="flex: 1; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{a.name}}</span>
+            <span style="color: {{c.dim}}; font-size: 12px">{{a.count}}</span>
+          </button>
+          <sc-if value="{{a.canAdd}}" hint-placeholder-val="{{ true }}">
+            <button aria-label="把已选照片加入 {{a.name}}" title="把已选照片加入此相册（也可直接拖进来）" onClick="{{a.add}}" style="width: 28px; height: 28px; flex: none; border: 0; border-radius: 6px; background: transparent; color: {{c.muted}}; cursor: pointer; font-size: 16px">＋</button>
+          </sc-if>
+        </div>
+      </sc-for>
+      <sc-if value="{{msgOn}}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="margin: 6px 4px 0; padding: 6px 10px; border-radius: 6px; background: rgba(242,194,48,0.14); color: #f2c230; font-size: 12px">{{msg}}</div>
+      </sc-if>
+      <sc-if value="{{ca.on}}" hint-placeholder-val="{{ false }}">
+        <div style="margin: 8px 4px 0; padding: 10px 12px; border-radius: 8px; background: {{c.well}}; border: 1px solid {{c.line}}; display: flex; flex-direction: column; gap: 8px">
+          <span style="font-weight: 600">{{ca.name}} <span style="font-weight: 400; color: {{c.muted}}; font-size: 12px; margin-left: 4px">{{ca.typeLabel}}</span></span>
+          <sc-if value="{{ca.canKw}}" hint-placeholder-val="{{ true }}">
+            <button aria-pressed="{{ca.kwPressed}}" onClick="{{ca.kwToggle}}" style="display: flex; align-items: center; justify-content: space-between; min-height: 28px; padding: 0; border: 0; background: transparent; cursor: pointer">
+              <span>写入照片关键字</span>
+              <span aria-hidden="true" style="width: 34px; height: 20px; border-radius: 10px; background: {{ca.kwTrack}}; position: relative; display: block">
+                <span style="position: absolute; top: 2px; left: {{ca.kwKnob}}; width: 16px; height: 16px; border-radius: 8px; background: #ffffff; display: block"></span>
+              </span>
+            </button>
+            <span style="font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: {{c.muted}}">{{ca.kwPath}}</span>
+            <button onClick="{{ca.remove}}" style="min-height: 30px; border: 1px solid {{c.ctl}}; border-radius: 6px; background: transparent; cursor: pointer">移出已选照片（{{ca.removeCount}}）</button>
+          </sc-if>
+          <sc-if value="{{ca.smart}}" hint-placeholder-val="{{ false }}">
+            <span style="font-size: 12px; color: {{c.muted}}">规则：评分 ≥ 4 星（自动收集）</span>
+          </sc-if>
+          <sc-if value="{{ca.parent}}" hint-placeholder-val="{{ false }}">
+            <span style="font-size: 12px; color: {{c.muted}}">包含所有下级相册的照片</span>
+          </sc-if>
+        </div>
+      </sc-if>
+      <sc-if value="{{folderHint}}" hint-placeholder-val="{{ true }}">
+        <div style="margin: 6px 10px 0; font-size: 12px; color: {{c.muted}}">把底栏的照片拖到相册上即可加入，同一张照片可加入多个相册</div>
+      </sc-if>
+
+      <div style="padding: 16px 10px 6px; font-size: 11px; letter-spacing: 0.08em; color: {{c.dim}}">筛选与排序</div>
+      <div style="padding: 0 4px; display: flex; flex-direction: column; gap: 8px">
+        <div role="group" aria-label="星级" style="display: flex; gap: 2px; background: {{c.well}}; padding: 3px; border-radius: 8px">
+          <sc-for list="{{starOpts}}" as="o" hint-placeholder-count="4">
+            <button aria-pressed="{{o.pressed}}" onClick="{{o.pick}}" style="flex: 1; min-height: 28px; border: 0; border-radius: 6px; background: {{o.bg}}; color: {{o.fg}}; cursor: pointer; font-size: 12px">{{o.label}}</button>
+          </sc-for>
+        </div>
+        <sc-for list="{{fltToggles}}" as="tg" hint-placeholder-count="2">
+          <button aria-pressed="{{tg.pressed}}" onClick="{{tg.toggle}}" style="display: flex; align-items: center; justify-content: space-between; min-height: 30px; padding: 0 6px; border: 0; background: transparent; cursor: pointer">
+            <span>{{tg.label}}</span>
+            <span aria-hidden="true" style="width: 34px; height: 20px; border-radius: 10px; background: {{tg.track}}; position: relative; display: block">
+              <span style="position: absolute; top: 2px; left: {{tg.knob}}; width: 16px; height: 16px; border-radius: 8px; background: #ffffff; display: block"></span>
+            </span>
+          </button>
+        </sc-for>
+        <span style="font-size: 12px; color: {{c.sub}}; padding: 4px 6px 0">排序</span>
+        <div role="group" aria-label="排序" style="display: flex; gap: 2px; background: {{c.well}}; padding: 3px; border-radius: 8px">
+          <sc-for list="{{sortOpts}}" as="o" hint-placeholder-count="2">
+            <button aria-pressed="{{o.pressed}}" onClick="{{o.pick}}" style="flex: 1; min-height: 28px; border: 0; border-radius: 6px; background: {{o.bg}}; color: {{o.fg}}; cursor: pointer; font-size: 12px">{{o.label}}</button>
+          </sc-for>
+        </div>
+        <span style="font-size: 12px; color: {{c.sub}}; padding: 4px 6px 0">显示</span>
+        <sc-for list="{{dispToggles}}" as="tg" hint-placeholder-count="1">
+          <button aria-pressed="{{tg.pressed}}" onClick="{{tg.toggle}}" style="display: flex; align-items: center; justify-content: space-between; min-height: 30px; padding: 0 6px; border: 0; background: transparent; cursor: pointer">
+            <span>{{tg.label}}</span>
+            <span aria-hidden="true" style="width: 34px; height: 20px; border-radius: 10px; background: {{tg.track}}; position: relative; display: block">
+              <span style="position: absolute; top: 2px; left: {{tg.knob}}; width: 16px; height: 16px; border-radius: 8px; background: #ffffff; display: block"></span>
+            </span>
+          </button>
+        </sc-for>
+      </div>
+    </aside>
+    <sc-if value="{{L.hot}}" hint-placeholder-val="{{ false }}">
+      <div aria-hidden="true" onMouseEnter="{{L.enter}}" style="position: absolute; top: 0; bottom: 0; left: 0; width: 6px; z-index: 19"></div>
+    </sc-if>
+
+    <main style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+      <section aria-label="照片区域" style="flex: 1; min-height: 0; position: relative; background: {{c.stage}}">
+        <div onDoubleClick="{{toggleZoom}}" title="双击在“适合”和 100% 之间切换" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 32px; box-sizing: border-box; overflow: hidden; cursor: {{zoomCursor}}">
+          <sc-if value="{{hasCur}}" hint-placeholder-val="{{ true }}">
+            <svg role="img" aria-label="{{curName}} 预览" viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice" style="height: 100%; max-width: 100%; aspect-ratio: 3 / 2; display: block; box-shadow: 0 6px 30px rgba(0,0,0,0.35); transform: {{zoomTf}}; transition: transform 200ms ease">
+              <rect width="300" height="200" fill="{{curP.sky}}"></rect>
+              <circle cx="210" cy="70" r="22" fill="{{curP.sun}}"></circle>
+              <path d="M0 140 L60 90 L110 125 L170 70 L230 120 L300 85 L300 200 L0 200Z" fill="{{curP.far}}"></path>
+              <path d="M0 170 L80 135 L150 160 L220 128 L300 155 L300 200 L0 200Z" fill="{{curP.near}}"></path>
+            </svg>
+          </sc-if>
+        </div>
+        <sc-if value="{{zoomed}}" hint-placeholder-val="{{ false }}">
+          <span role="status" style="position: absolute; left: 24px; bottom: 24px; z-index: 6; padding: 4px 10px; border-radius: 6px; background: {{c.chip}}; font-size: 12px">100% · 双击返回适合</span>
+        </sc-if>
+
+        <sc-if value="{{expand}}" hint-placeholder-val="{{ false }}">
+          <div role="region" aria-label="展开的照片网格" style="position: absolute; inset: 0; z-index: 12; background: {{c.bg}}; display: flex; flex-direction: column">
+            <div style="height: 44px; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 16px; border-bottom: 1px solid {{c.line}}">
+              <span style="font-weight: 600">{{srcName}}</span>
+              <span style="color: {{c.muted}}">{{stripCount}} 张</span>
+              <div style="flex: 1"></div>
+              <button onClick="{{selectAll}}" style="min-height: 28px; padding: 0 12px; border: 1px solid {{c.ctl}}; border-radius: 6px; background: transparent; cursor: pointer">全选</button>
+              <button onClick="{{clearSel}}" style="min-height: 28px; padding: 0 12px; border: 1px solid {{c.ctl}}; border-radius: 6px; background: transparent; cursor: pointer">清除选择</button>
+            </div>
+            <div style="flex: 1; min-height: 0; overflow: auto; padding: 16px; box-sizing: border-box; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px 12px; align-content: start">
+              <sc-for list="{{strip}}" as="g" hint-placeholder-count="12">
+                <button aria-pressed="{{g.pressed}}" aria-label="{{g.name}}" onClick="{{g.click}}" draggable="true" onDragStart="{{g.drag}}" style="padding: 0; border: 0; background: transparent; cursor: pointer; text-align: left; display: flex; flex-direction: column; gap: 6px">
+                  <span style="position: relative; display: block; border-radius: 4px; overflow: hidden; outline: 2px solid {{g.ring}}; outline-offset: 2px">
+                    <svg viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="width: 100%; aspect-ratio: 3 / 2; display: block">
+                      <rect width="300" height="200" fill="{{g.sky}}"></rect>
+                      <circle cx="210" cy="70" r="22" fill="{{g.sun}}"></circle>
+                      <path d="M0 140 L60 90 L110 125 L170 70 L230 120 L300 85 L300 200 L0 200Z" fill="{{g.far}}"></path>
+                      <path d="M0 170 L80 135 L150 160 L220 128 L300 155 L300 200 L0 200Z" fill="{{g.near}}"></path>
+                    </svg>
+                    <span style="position: absolute; left: 6px; top: 6px; font-size: 10px; font-weight: 600; padding: 1px 5px; border-radius: 3px; background: rgba(15,16,18,0.78); color: #f2f2f2">{{g.type}}</span>
+                    <sc-if value="{{g.picked}}" hint-placeholder-val="{{ false }}">
+                      <span aria-hidden="true" style="position: absolute; right: 6px; bottom: 6px; width: 20px; height: 20px; border-radius: 10px; background: #f2c230; color: #141518; display: flex; align-items: center; justify-content: center">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5 9-10"></path></svg>
+                      </span>
+                    </sc-if>
+                  </span>
+                  <span style="display: flex; justify-content: space-between; font-size: 12px; color: {{g.fg}}">{{g.name}}<span style="color: #f2c230">{{g.on}}</span></span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <div onMouseEnter="{{ctlEnter}}" onMouseLeave="{{ctlLeave}}" style="position: absolute; right: 24px; bottom: 24px; z-index: 15; opacity: {{ctlOpacity}}; pointer-events: {{ctlPE}}; transition: opacity 300ms ease; display: flex; align-items: center; gap: 2px; padding: 4px; border-radius: 10px; background: {{c.chip}}; box-shadow: 0 4px 18px rgba(0,0,0,0.35)">
+          <div role="group" aria-label="显示方式" style="display: flex; gap: 2px">
+            <sc-for list="{{modes}}" as="m" hint-placeholder-count="3">
+              <button aria-pressed="{{m.pressed}}" onClick="{{m.pick}}" title="{{m.tip}}" style="display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px; border: 0; border-radius: 7px; background: {{m.bg}}; color: {{m.fg}}; cursor: pointer; font-size: 12px">
+                <svg width="20" height="15" viewBox="0 0 22 16" aria-hidden="true"><rect x="1" y="1" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"></rect><rect x="1" y="1" width="20" height="3" fill="currentColor" fill-opacity="{{m.t}}"></rect><rect x="1" y="1" width="4" height="14" fill="currentColor" fill-opacity="{{m.l}}"></rect><rect x="17" y="1" width="4" height="14" fill="currentColor" fill-opacity="{{m.r}}"></rect><rect x="1" y="11" width="20" height="4" fill="currentColor" fill-opacity="{{m.b}}"></rect></svg>
+                {{m.label}}
+              </button>
+            </sc-for>
+          </div>
+          <span aria-hidden="true" style="width: 1px; height: 20px; background: {{c.line}}; margin: 0 4px"></span>
+          <button aria-pressed="{{fullPressed}}" aria-label="{{fullLabel}}" title="{{fullLabel}}" onClick="{{toggleFull}}" style="width: 36px; height: 32px; border: 0; border-radius: 7px; background: {{fullBg}}; color: {{fullFg}}; cursor: pointer; display: flex; align-items: center; justify-content: center">
+            <sc-if value="{{full}}" hint-placeholder-val="{{ false }}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"></path></svg>
+            </sc-if>
+            <sc-if value="{{notFull}}" hint-placeholder-val="{{ true }}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg>
+            </sc-if>
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <aside aria-label="照片信息" onMouseLeave="{{R.leave}}" style="position: {{R.pos}}; top: 0; bottom: 0; right: 0; z-index: 20; width: 300px; flex: none; box-sizing: border-box; transform: {{R.tf}}; transition: transform 160ms ease; box-shadow: {{R.shadow}}; background: {{c.panel}}; border-left: 1px solid {{c.line}}; overflow-y: auto; padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 16px">
+      <div>
+        <div style="font-size: 16px; font-weight: 600">{{detail.name}}</div>
+        <div style="color: {{c.muted}}; margin-top: 4px">{{detail.size}}</div>
+        <sc-if value="{{detail.pair}}" hint-placeholder-val="{{ true }}">
+          <div role="group" aria-label="叠加的文件" style="display: flex; gap: 2px; background: {{c.well}}; padding: 3px; border-radius: 8px; margin-top: 10px">
+            <sc-for list="{{pairOpts}}" as="o" hint-placeholder-count="2">
+              <button aria-pressed="{{o.pressed}}" onClick="{{o.pick}}" style="flex: 1; min-height: 28px; border: 0; border-radius: 6px; background: {{o.bg}}; color: {{o.fg}}; cursor: pointer">{{o.label}}</button>
+            </sc-for>
+          </div>
+        </sc-if>
+        <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap">
+          <div role="group" aria-label="评分" style="display: flex">
+            <sc-for list="{{starBtns}}" as="sb" hint-placeholder-count="5">
+              <button aria-label="{{sb.label}}" aria-pressed="{{sb.pressed}}" onClick="{{sb.pick}}" style="width: 24px; height: 30px; padding: 0; border: 0; background: transparent; color: {{sb.color}}; cursor: pointer; font-size: 17px">★</button>
+            </sc-for>
+          </div>
+          <div role="group" aria-label="色标" style="display: flex; gap: 4px">
+            <sc-for list="{{labelBtns}}" as="lb" hint-placeholder-count="6">
+              <button aria-label="{{lb.label}}" aria-pressed="{{lb.pressed}}" onClick="{{lb.pick}}" style="width: 22px; height: 22px; padding: 0; border-radius: 11px; border: 2px solid {{lb.ring}}; background: {{lb.color}}; cursor: pointer"></button>
+            </sc-for>
+          </div>
+          <button aria-pressed="{{rejPressed}}" onClick="{{toggleRej}}" style="min-height: 28px; padding: 0 10px; border-radius: 6px; border: 1px solid {{rejBorder}}; background: transparent; color: {{rejColor}}; cursor: pointer; font-size: 12px">排除</button>
+        </div>
+        <div style="margin-top: 6px; font-size: 11px; color: {{c.dim}}">快捷键：1–5 评分 · 0 清除 · X 排除</div>
+      </div>
+
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-radius: 8px; background: {{c.well}}; border: 1px solid {{c.line}}">
+        <span style="display: flex; align-items: center; gap: 8px">
+          <span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 4px; background: {{detail.dot}}"></span>
+          {{detail.edits}}
+        </span>
+      </div>
+
+      <div>
+        <div style="font-size: 11px; letter-spacing: 0.08em; color: {{c.dim}}; margin-bottom: 8px">所属相册</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px">
+          <sc-for list="{{memChips}}" as="m" hint-placeholder-count="3">
+            <span style="padding: 3px 10px; border-radius: 12px; background: {{c.ctl}}; font-size: 12px">{{m.name}}</span>
+          </sc-for>
+          <sc-if value="{{noMem}}" hint-placeholder-val="{{ false }}">
+            <span style="color: {{c.muted}}; font-size: 12px">尚未加入任何相册</span>
+          </sc-if>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size: 11px; letter-spacing: 0.08em; color: {{c.dim}}; margin-bottom: 8px">拍摄信息</div>
+        <dl style="margin: 0; display: grid; grid-template-columns: 76px 1fr; row-gap: 7px; column-gap: 8px">
+          <sc-for list="{{exif}}" as="e" hint-placeholder-count="12">
+            <dt style="color: {{c.muted}}">{{e.k}}</dt>
+            <dd style="margin: 0">{{e.v}}</dd>
+          </sc-for>
+        </dl>
+      </div>
+    </aside>
+    <sc-if value="{{R.hot}}" hint-placeholder-val="{{ false }}">
+      <div aria-hidden="true" onMouseEnter="{{R.enter}}" style="position: absolute; top: 0; bottom: 0; right: 0; width: 6px; z-index: 19"></div>
+    </sc-if>
+  </div>
+
+  <footer aria-label="照片浏览与选择" onMouseLeave="{{B.leave}}" style="position: {{B.pos}}; bottom: 0; left: 0; right: 0; z-index: 30; transform: {{B.tf}}; transition: transform 160ms ease; box-shadow: {{B.shadow}}; height: 108px; flex: none; box-sizing: border-box; display: flex; align-items: center; gap: 16px; padding: 0 16px; background: {{c.panel}}; border-top: 1px solid {{c.line}}">
+    <div style="width: 236px; flex: none; display: flex; flex-direction: column; gap: 6px">
+      <div style="display: flex; gap: 6px; align-items: center">
+        <div aria-label="当前来源" title="来源在浏览页左栏选择" style="flex: 1; min-width: 0; min-height: 32px; padding: 0 10px; box-sizing: border-box; border-radius: 6px; background: {{c.well}}; display: flex; align-items: center; gap: 6px">
+          <sc-if value="{{isFolderSrc}}" hint-placeholder-val="{{ true }}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" style="flex: none"><path d="M3 6h6l2 2h10v11H3z"></path></svg>
+          </sc-if>
+          <sc-if value="{{isAlbumSrc}}" hint-placeholder-val="{{ false }}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f2c230" stroke-width="1.8" aria-hidden="true" style="flex: none"><rect x="3" y="7" width="14" height="13" rx="1.5"></rect><path d="M7 4h12a2 2 0 0 1 2 2v11"></path></svg>
+          </sc-if>
+          <span style="flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{srcName}}</span>
+        </div>
+      </div>
+      <span style="color: {{c.muted}}; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{srcHint}}</span>
+      <span style="color: {{c.dim}}; font-size: 11px">{{posLabel}} · Ctrl/⌘ 多选 · Shift 连选</span>
+    </div>
+    <sc-if value="{{stripEmpty}}" hint-placeholder-val="{{ false }}">
+      <div style="flex: 1; color: {{c.muted}}; text-align: center">{{emptyText}}</div>
+    </sc-if>
+    <div role="group" aria-label="照片条" style="flex: 1; min-width: 0; display: flex; gap: 8px; overflow-x: auto; padding: 6px 2px">
+      <sc-for list="{{strip}}" as="s" hint-placeholder-count="10">
+        <button aria-pressed="{{s.pressed}}" aria-label="{{s.name}}" onClick="{{s.click}}" draggable="true" onDragStart="{{s.drag}}" style="flex: 0 0 100px; padding: 0; border: 0; background: transparent; cursor: pointer; display: flex; flex-direction: column; gap: 4px">
+          <span style="position: relative; display: block; height: 66px; border-radius: 4px; overflow: hidden; outline: 2px solid {{s.ring}}; outline-offset: 1px; opacity: {{s.op}}">
+            <svg viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="width: 100%; height: 100%; display: block">
+              <rect width="300" height="200" fill="{{s.sky}}"></rect>
+              <circle cx="210" cy="70" r="22" fill="{{s.sun}}"></circle>
+              <path d="M0 140 L60 90 L110 125 L170 70 L230 120 L300 85 L300 200 L0 200Z" fill="{{s.far}}"></path>
+              <path d="M0 170 L80 135 L150 160 L220 128 L300 155 L300 200 L0 200Z" fill="{{s.near}}"></path>
+            </svg>
+            <span style="position: absolute; left: 4px; top: 4px; font-size: 9px; font-weight: 600; padding: 0 4px; border-radius: 3px; background: rgba(15,16,18,0.78); color: #f2f2f2">{{s.type}}</span>
+            <sc-if value="{{s.edited}}" hint-placeholder-val="{{ false }}">
+              <span title="已编辑" style="position: absolute; right: 5px; top: 5px; width: 8px; height: 8px; border-radius: 4px; background: #f2c230"></span>
+            </sc-if>
+            <sc-if value="{{s.rej}}" hint-placeholder-val="{{ false }}">
+              <span style="position: absolute; left: 4px; bottom: 4px; font-size: 9px; font-weight: 600; padding: 0 4px; border-radius: 3px; background: #e0574f; color: #141518">排除</span>
+            </sc-if>
+            <sc-if value="{{s.picked}}" hint-placeholder-val="{{ false }}">
+              <span aria-hidden="true" style="position: absolute; right: 4px; bottom: 4px; width: 16px; height: 16px; border-radius: 8px; background: #f2c230; color: #141518; display: flex; align-items: center; justify-content: center">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="M5 12l5 5 9-10"></path></svg>
+              </span>
+            </sc-if>
+          </span>
+          <span style="font-size: 11px; color: {{s.fg}}; display: flex; justify-content: space-between">{{s.short}}<span style="color: #f2c230">{{s.on}}</span></span>
+        </button>
+      </sc-for>
+    </div>
+    <div style="width: 96px; flex: none; display: flex; flex-direction: column; gap: 6px">
+      <span style="text-align: center; color: {{c.muted}}; font-size: 12px">已选 {{pickedCount}}</span>
+      <button aria-pressed="{{expandPressed}}" onClick="{{toggleExpand}}" style="min-height: 30px; border: 1px solid {{expandBorder}}; border-radius: 6px; background: transparent; color: {{expandColor}}; cursor: pointer">{{expandLabel}}</button>
+    </div>
+  </footer>
+  <sc-if value="{{B.hot}}" hint-placeholder-val="{{ false }}">
+    <div aria-hidden="true" onMouseEnter="{{B.enter}}" style="position: absolute; bottom: 0; left: 0; right: 0; height: 6px; z-index: 29"></div>
+  </sc-if>
+  <sc-if value="{{modalOpen}}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-modal="true" aria-label="{{modal.title}}" style="position: absolute; inset: 0; z-index: 60; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center">
+      <div style="width: 600px; max-width: calc(100% - 32px); max-height: calc(100% - 64px); overflow-y: auto; background: {{c.panel}}; border: 1px solid {{c.line}}; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <span style="font-size: 16px; font-weight: 600">{{modal.title}}</span>
+          <button aria-label="关闭" onClick="{{closeModal}}" style="width: 32px; height: 32px; border: 0; border-radius: 6px; background: transparent; color: {{c.muted}}; cursor: pointer; font-size: 18px">×</button>
+        </div>
+        <span style="color: {{c.muted}}">{{modal.desc}}</span>
+        <sc-for list="{{modal.groups}}" as="mg" hint-placeholder-count="5">
+          <div style="display: grid; grid-template-columns: 112px 1fr; align-items: center; gap: 12px">
+            <span style="color: {{c.sub}}">{{mg.title}}</span>
+            <div role="group" aria-label="{{mg.title}}" style="display: flex; gap: 2px; background: {{c.well}}; padding: 3px; border-radius: 8px">
+              <sc-for list="{{mg.opts}}" as="o" hint-placeholder-count="3">
+                <button aria-pressed="{{o.pressed}}" onClick="{{o.pick}}" style="flex: 1; min-height: 28px; padding: 0 8px; border: 0; border-radius: 6px; background: {{o.bg}}; color: {{o.fg}}; cursor: pointer; font-size: 12px; white-space: nowrap">{{o.label}}</button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+        <span style="font-size: 12px; color: {{c.muted}}">{{modal.note}}</span>
+        <div style="display: flex; justify-content: flex-end; gap: 8px">
+          <button onClick="{{closeModal}}" style="min-height: 34px; padding: 0 16px; border: 1px solid {{c.ctl}}; border-radius: 6px; background: transparent; cursor: pointer">取消</button>
+          <button onClick="{{closeModal}}" style="min-height: 34px; padding: 0 18px; border: 0; border-radius: 6px; background: #f2c230; color: #141518; font-weight: 600; cursor: pointer">{{modal.ok}}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","gray"],"default":"dark"},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      theme: props.theme === 'gray' ? 'gray' : 'dark',
+      mode: 'std', full: false, active: true, gear: false, expand: false,
+      hov: { top: false, bottom: false, left: false, right: false },
+      src: 'folder', folder: 'f10', album: 'momiji', mem: this.defaultMem(),
+      flt: { stars: 0, edited: false, hideRej: false, stack: true, q: '' },
+      rt: {}, lb: { '0421': 'red' }, rej: { '0428': true }, sort: 'time', zoom: false, modal: null, mopt: {},
+      kw: { kyoto: true, momiji: true, night: true, family: true, basket: false },
+      cur: 'DSC_0421', picked: { DSC_0421: true },
+      pairView: 'NEF', msg: ''
+    };
+    this.overCtl = false;
+    this.t = null;
+    this.mt = null;
+    this.dragKey = null;
+    this.onFs = () => this.setState({ full: !!document.fullscreenElement });
+  }
+  componentDidMount() { this.poke(); document.addEventListener('fullscreenchange', this.onFs); }
+  componentWillUnmount() { clearTimeout(this.t); clearTimeout(this.mt); document.removeEventListener('fullscreenchange', this.onFs); }
+  componentDidUpdate(prev) {
+    if (prev.theme !== this.props.theme && (this.props.theme === 'gray' || this.props.theme === 'dark')) this.setState({ theme: this.props.theme });
+  }
+  poke() {
+    if (!this.state.active) this.setState({ active: true });
+    clearTimeout(this.t);
+    this.t = setTimeout(() => { if (!this.overCtl) this.setState({ active: false }); }, 2000);
+  }
+  pick(order, key, e) {
+    const s = this.state;
+    if (e && (e.metaKey || e.ctrlKey)) {
+      const picked = Object.assign({}, s.picked);
+      if (picked[key]) delete picked[key]; else picked[key] = true;
+      this.setState({ picked, cur: key });
+      return;
+    }
+    if (e && e.shiftKey && order.indexOf(s.cur) >= 0) {
+      const a = order.indexOf(s.cur), b = order.indexOf(key);
+      const picked = {};
+      for (let i = Math.min(a, b); i <= Math.max(a, b); i++) picked[order[i]] = true;
+      this.setState({ picked });
+      return;
+    }
+    this.setState({ cur: key, picked: { [key]: true } });
+  }
+  defaultMem() {
+    return {
+      kyoto: ['0414', '0417', '0418', '0420', '0421', '0423', '0426', '0428', '0431', '0433', '0436', '0440'],
+      momiji: ['0421', '0420', '0423', '0428'],
+      night: ['0431', '0433', '0436'],
+      family: ['0426', '0414'],
+      basket: ['0421', '0426', '0440']
+    };
+  }
+  albumDefs() {
+    return [
+      { id: 'travel', name: '旅行', depth: 0, kids: ['japan'], group: 'album' },
+      { id: 'japan', name: '日本', depth: 1, kids: ['kyoto', 'momiji'], group: 'album' },
+      { id: 'kyoto', name: '京都', depth: 2, group: 'album' },
+      { id: 'momiji', name: '京都 · 红叶', depth: 2, group: 'album' },
+      { id: 'night', name: '夜景', depth: 0, group: 'album' },
+      { id: 'family', name: '家人', depth: 0, group: 'album' },
+      { id: 'best', name: '4 星以上', depth: 0, group: 'smart', smart: true },
+      { id: 'basket', name: '待整理', depth: 0, group: 'temp' }
+    ];
+  }
+  membersOf(id, base) {
+    const d = this.albumDefs().find((a) => a.id === id);
+    if (!d) return [];
+    if (d.smart) return base.filter((p) => p.stars >= 4).map((p) => p.n);
+    if (d.kids) {
+      const set = {};
+      d.kids.forEach((k) => this.membersOf(k, base).forEach((n) => { set[n] = true; }));
+      return base.map((p) => p.n).filter((n) => set[n]);
+    }
+    return (this.state.mem[id] || []).slice();
+  }
+  uniq(all) {
+    const seen = {};
+    const out = [];
+    all.forEach((p) => { if (!seen[p.n]) { seen[p.n] = true; out.push(p); } });
+    return out;
+  }
+  sourceList(all) {
+    const s = this.state;
+    let out = all;
+    if (s.src === 'album') {
+      const order = this.membersOf(s.album, this.uniq(all));
+      out = [];
+      order.forEach((n) => all.filter((p) => p.n === n).forEach((p) => out.push(p)));
+    }
+    const f = s.flt;
+    out = out.filter((p) => p.stars >= f.stars && (!f.edited || p.edited) && (!f.hideRej || !p.rej) && (!f.q || p.name.indexOf(f.q) >= 0));
+    if (s.src === 'folder' && s.sort === 'rating') out = out.slice().sort((a, b) => b.stars - a.stars);
+    return out;
+  }
+  srcInfo() {
+    const s = this.state;
+    const FOLDERS = { f10: '10 京都秋叶', f09: '09 海岸线', f08: '08 城市夜景' };
+    const d = this.albumDefs().find((a) => a.id === s.album);
+    const isAlbum = s.src === 'album';
+    const f = s.flt;
+    const parts = [];
+    if (f.stars) parts.push('★' + f.stars + (f.stars < 5 ? '+' : ''));
+    if (f.edited) parts.push('已编辑');
+    if (f.q) parts.push('“' + f.q + '”');
+    const order = isAlbum ? (d && (d.kids || d.smart) ? '按拍摄时间' : '相册顺序') : (s.sort === 'rating' ? '按评分' : '按拍摄时间');
+    return {
+      isAlbumSrc: isAlbum, isFolderSrc: !isAlbum,
+      srcName: isAlbum ? d.name : FOLDERS[s.folder],
+      srcHint: (isAlbum ? '相册 · ' : '文件夹 · ') + order + (parts.length ? ' · ' + parts.join(' · ') : ''),
+      canPlay: isAlbum, noPlay: !isAlbum
+    };
+  }
+  photos(stack) {
+    const P = {
+      autumn: ['#e9b07a', '#a4553a', '#5a2a1f', '#fff1c9'], dusk: ['#3d4a7a', '#6b5a8e', '#22203a', '#f6c27a'],
+      sea: ['#9cc7d9', '#4f8aa3', '#1f4655', '#ffffff'], forest: ['#c9d8b6', '#6f8f5a', '#2f4a2b', '#fff6d8'],
+      night: ['#1b2140', '#3a3f6b', '#0e1022', '#ffd56b'], mono: ['#cfcfcf', '#8a8a8a', '#3a3a3a', '#ffffff'],
+      snow: ['#dfe7ef', '#9fb2c4', '#5b6b7a', '#fffbe8'], sunset: ['#f29b6b', '#c4574a', '#4a1f2a', '#ffe2a8']
+    };
+    const list = [
+      ['0414', 'forest', 3, false, false], ['0417', 'snow', 4, true, false], ['0418', 'sea', 3, false, false],
+      ['0420', 'sunset', 5, true, true], ['0421', 'autumn', 4, true, true], ['0423', 'autumn', 3, false, false],
+      ['0426', 'mono', 4, true, false], ['0428', 'dusk', 2, false, false], ['0431', 'dusk', 5, true, true],
+      ['0433', 'night', 3, false, false], ['0436', 'night', 4, false, false], ['0440', 'sea', 4, true, false]
+    ];
+    const out = [];
+    list.forEach(([n, k, r0, ed, pair]) => {
+      const col = P[k];
+      const r = this.state.rt[n] != null ? this.state.rt[n] : r0;
+      const base = { n, stars: r, rej: !!this.state.rej[n], sky: col[0], far: col[1], near: col[2], sun: col[3], on: '★'.repeat(r), off: '★'.repeat(5 - r) };
+      if (pair && stack) {
+        out.push(Object.assign({}, base, { key: 'DSC_' + n, name: 'DSC_' + n, short: n, type: 'NEF+JPG', edited: ed, pair: true }));
+      } else {
+        out.push(Object.assign({}, base, { key: 'DSC_' + n, name: 'DSC_' + n + '.NEF', short: n, type: 'NEF', edited: ed, pair: false }));
+        if (pair) out.push(Object.assign({}, base, { key: 'DSC_' + n + '.JPG', name: 'DSC_' + n + '.JPG', short: n + ' J', type: 'JPG', edited: false, pair: false }));
+      }
+    });
+    return out;
+  }
+  shell() {
+    const s = this.state;
+    const THEMES = {
+      dark: { bg: '#141518', panel: '#1b1c20', stage: '#0f1012', line: '#2a2c31', ctl: '#2f3137', well: '#141518', chip: 'rgba(27,28,32,0.9)', text: '#e6e7ea', sub: '#c9cbd1', muted: '#9a9ca3', dim: '#8b8d94', off: '#3a3d44', starOff: '#45484f', histo: '#8c8f97', ok: '#7fc79a' },
+      gray: { bg: '#3d3d3d', panel: '#474747', stage: '#7a7a7a', line: '#585858', ctl: '#5f5f5f', well: '#3a3a3a', chip: 'rgba(71,71,71,0.94)', text: '#f2f2f2', sub: '#e2e2e2', muted: '#cbcbcb', dim: '#c4c4c4', off: '#6a6a6a', starOff: '#6e6e6e', histo: '#d0d0d0', ok: '#a6e3bb' }
+    };
+    const c = THEMES[s.theme];
+    const HIDE = { top: 'translateY(-100%)', bottom: 'translateY(100%)', left: 'translateX(-100%)', right: 'translateX(100%)' };
+    const fixedIn = (mode, k) => mode === 'std' || (mode === 'focus' && k === 'bottom');
+    const panel = (k) => {
+      const f = fixedIn(s.mode, k);
+      const show = f || s.hov[k] || (k === 'top' && s.gear);
+      return {
+        pos: f ? 'relative' : 'absolute',
+        tf: show ? 'none' : HIDE[k],
+        shadow: f ? 'none' : '0 8px 32px rgba(0,0,0,0.45)',
+        hot: !f,
+        enter: () => this.setState({ hov: Object.assign({}, this.state.hov, { [k]: true }) }),
+        leave: () => { if (!fixedIn(this.state.mode, k)) this.setState({ hov: Object.assign({}, this.state.hov, { [k]: false }) }); }
+      };
+    };
+    const themes = [['dark', '深色', '#1b1c20'], ['gray', '中性灰', '#7a7a7a']].map(([id, label, swatch]) => {
+      const on = s.theme === id;
+      return { label, swatch, pressed: on ? 'true' : 'false', bg: on ? c.ctl : 'transparent', pick: () => this.setState({ theme: id }) };
+    });
+    const MODES = [
+      ['std', '标准', '标准：所有栏固定显示', 1, 1, 1, 1],
+      ['focus', '专注', '专注：仅底部照片条固定，其余栏移到边缘时浮出', 0, 0, 0, 1],
+      ['immersive', '沉浸', '沉浸：所有栏自动隐藏，移到边缘时浮出', 0, 0, 0, 0]
+    ];
+    const modes = MODES.map(([id, label, tip, t, l, r, b]) => {
+      const on = s.mode === id;
+      return {
+        label, tip, t: t ? 0.9 : 0, l: l ? 0.9 : 0, r: r ? 0.9 : 0, b: b ? 0.9 : 0,
+        pressed: on ? 'true' : 'false', bg: on ? '#f2c230' : 'transparent', fg: on ? '#141518' : c.text,
+        pick: () => this.setState({ mode: id, hov: { top: false, bottom: false, left: false, right: false } })
+      };
+    });
+    const shown = s.active || this.overCtl;
+    return {
+      c, themes, modes,
+      T: panel('top'), B: panel('bottom'), L: panel('left'), R: panel('right'),
+      gearOpen: s.gear, gearExpanded: s.gear ? 'true' : 'false', gearBg: s.gear ? c.ctl : 'transparent',
+      toggleGear: () => this.setState({ gear: !this.state.gear }),
+      full: s.full, notFull: !s.full,
+      fullPressed: s.full ? 'true' : 'false',
+      fullLabel: s.full ? '退出全屏（窗口模式）' : '全屏模式',
+      fullBg: s.full ? c.ctl : 'transparent',
+      fullFg: s.full ? '#f2c230' : c.text,
+      toggleFull: () => {
+        try {
+          if (document.fullscreenElement) document.exitFullscreen();
+          else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
+        } catch (err) {}
+        this.setState({ full: !this.state.full });
+      },
+      expand: s.expand, expandPressed: s.expand ? 'true' : 'false', expandLabel: s.expand ? '收起' : '展开',
+      expandBorder: s.expand ? '#f2c230' : c.ctl, expandColor: s.expand ? '#f2c230' : c.text,
+      toggleExpand: () => this.setState({ expand: !this.state.expand }),
+      ctlOpacity: shown ? 1 : 0,
+      ctlPE: shown ? 'auto' : 'none',
+      cursor: s.mode === 'immersive' && !shown ? 'none' : 'default',
+      onMove: () => this.poke(),
+      ctlEnter: () => { this.overCtl = true; this.poke(); },
+      ctlLeave: () => { this.overCtl = false; this.poke(); }
+    };
+  }
+  stripItems(list, c) {
+    const s = this.state;
+    const order = list.map((p) => p.key);
+    return list.map((p) => {
+      const isCur = p.key === s.cur;
+      const pk = !!s.picked[p.key];
+      return Object.assign({}, p, {
+        picked: pk, pressed: pk ? 'true' : 'false', op: p.rej ? 0.4 : 1,
+        ring: isCur ? '#f2c230' : (pk ? 'rgba(242,194,48,0.55)' : 'transparent'),
+        fg: isCur ? '#f2c230' : c.sub,
+        click: (e) => this.pick(order, p.key, e),
+        drag: (e) => { this.dragKey = p.key; try { e.dataTransfer.setData('text/plain', p.key); } catch (err) {} }
+      });
+    });
+  }
+  flash(msg) {
+    this.setState({ msg });
+    clearTimeout(this.mt);
+    this.mt = setTimeout(() => this.setState({ msg: '' }), 2500);
+  }
+  addTo(d) {
+    const s = this.state;
+    const keys = this.dragKey && !s.picked[this.dragKey] ? [this.dragKey] : Object.keys(s.picked);
+    this.dragKey = null;
+    const ns = [];
+    keys.forEach((k) => { const n = k.replace('DSC_', '').replace('.JPG', ''); if (ns.indexOf(n) < 0) ns.push(n); });
+    const cur = s.mem[d.id] || [];
+    const add = ns.filter((n) => cur.indexOf(n) < 0);
+    const m = Object.assign({}, s.mem);
+    m[d.id] = cur.concat(add);
+    this.setState({ mem: m });
+    this.flash(add.length ? '已把 ' + add.length + ' 张加入「' + d.name + '」' : '所选照片已在「' + d.name + '」中');
+  }
+  modalVals(c, defs) {
+    const s = this.state;
+    const d = defs[s.modal];
+    const closeModal = () => this.setState({ modal: null });
+    if (!d) return { modalOpen: false, modal: { title: '', desc: '', note: '', ok: '', groups: [] }, closeModal };
+    const groups = d.groups.map(([key, title, opts]) => ({
+      title,
+      opts: opts.map(([v, label]) => {
+        const on = (s.mopt[key] || opts[0][0]) === v;
+        return { label, pressed: on ? 'true' : 'false', bg: on ? c.ctl : 'transparent', fg: on ? '#f2c230' : c.text, pick: () => this.setState({ mopt: Object.assign({}, this.state.mopt, { [key]: v }) }) };
+      })
+    }));
+    return { modalOpen: true, modal: { title: d.title, desc: d.desc, note: d.note, ok: d.ok, groups }, closeModal };
+  }
+  renderVals() {
+    const s = this.state;
+    const sh = this.shell();
+    const c = sh.c;
+    const all = this.photos(s.flt.stack);
+    const base = this.uniq(all);
+    const list = this.sourceList(all);
+    const order = list.map((p) => p.key);
+    const strip = this.stripItems(list, c);
+    const curP = all.find((p) => p.key === s.cur) || all.find((p) => p.n === s.cur.replace('DSC_', '').replace('.JPG', '')) || all[4];
+    const pickedKeys = Object.keys(s.picked);
+    const defs = this.albumDefs();
+    const src = this.srcInfo();
+
+    const FOLDERS = [['f10', '10 京都秋叶', '86'], ['f09', '09 海岸线', '142'], ['f08', '08 城市夜景', '57']];
+    const folderRows = FOLDERS.map(([id, name, count]) => {
+      const on = s.src === 'folder' && s.folder === id;
+      return { name, count, pressed: on ? 'true' : 'false', fg: on ? '#f2c230' : c.sub, bg: on ? c.ctl : 'transparent', pick: () => this.setState({ src: 'folder', folder: id }) };
+    });
+    const albumTree = defs.map((d) => {
+      const on = s.src === 'album' && s.album === d.id;
+      const editable = !d.kids && !d.smart;
+      return {
+        name: d.name, pad: 10 + d.depth * 16, count: this.membersOf(d.id, base).length,
+        isSmart: !!d.smart, isTemp: d.group === 'temp', isAlbum: !d.smart && d.group !== 'temp',
+        pressed: on ? 'true' : 'false', bg: on ? c.ctl : 'transparent', fg: on ? '#f2c230' : c.sub,
+        canAdd: editable,
+        pick: () => this.setState({ src: 'album', album: d.id }),
+        add: () => this.addTo(d),
+        over: (e) => { if (editable) e.preventDefault(); },
+        drop: (e) => { e.preventDefault(); if (editable) this.addTo(d); }
+      };
+    });
+    const parentOf = {};
+    defs.forEach((d) => { (d.kids || []).forEach((k) => { parentOf[k] = d.id; }); });
+    const pathOf = (id) => { const parts = []; let x = id; while (x) { const dd = defs.find((y) => y.id === x); parts.unshift(dd.name); x = parentOf[x]; } return parts.join('|'); };
+    const cd = defs.find((d) => d.id === s.album);
+    const caEditable = s.src === 'album' && !cd.kids && !cd.smart;
+    const kwOn = !!s.kw[cd.id];
+    const pickedNs = [];
+    pickedKeys.forEach((k) => { const n = k.replace('DSC_', '').replace('.JPG', ''); if (pickedNs.indexOf(n) < 0) pickedNs.push(n); });
+    const ca = {
+      on: s.src === 'album', name: cd.name,
+      typeLabel: cd.smart ? '智能相册' : (cd.kids ? '上级相册' : (cd.group === 'temp' ? '临时相册' : '相册')),
+      canKw: caEditable, smart: !!cd.smart, parent: !!cd.kids,
+      kwPressed: kwOn ? 'true' : 'false', kwTrack: kwOn ? '#f2c230' : c.off, kwKnob: kwOn ? '16px' : '2px',
+      kwPath: kwOn ? '关键字：' + pathOf(cd.id) : '只记录在 NICE 资料库中',
+      kwToggle: () => this.setState({ kw: Object.assign({}, this.state.kw, { [cd.id]: !kwOn }) }),
+      removeCount: pickedNs.length,
+      remove: () => {
+        if (!caEditable || !pickedNs.length) return;
+        const m = Object.assign({}, this.state.mem);
+        m[cd.id] = (m[cd.id] || []).filter((n) => pickedNs.indexOf(n) < 0);
+        this.setState({ mem: m, picked: {} });
+        this.flash('已从「' + cd.name + '」移出 ' + pickedNs.length + ' 张（原文件不受影响）');
+      }
+    };
+
+    const seg = (on) => ({ pressed: on ? 'true' : 'false', bg: on ? c.ctl : 'transparent', fg: on ? '#f2c230' : c.text });
+    const setF = (patch) => this.setState({ flt: Object.assign({}, this.state.flt, patch) });
+    const starOpts = [[0, '全部'], [3, '★3+'], [4, '★4+'], [5, '★5']].map(([v, label]) => Object.assign({ label, pick: () => setF({ stars: v }) }, seg(s.flt.stars === v)));
+    const tog = (label, key) => {
+      const on = !!s.flt[key];
+      return { label, pressed: on ? 'true' : 'false', track: on ? '#f2c230' : c.off, knob: on ? '16px' : '2px', toggle: () => setF({ [key]: !on }) };
+    };
+    const fltToggles = [tog('只看已编辑', 'edited'), tog('隐藏已排除', 'hideRej')];
+    const dispToggles = [tog('NEF + JPEG 叠加为一张', 'stack')];
+    const sortOpts = [['time', '拍摄时间'], ['rating', '评分']].map(([v, label]) => Object.assign({ label, pick: () => this.setState({ sort: v }) }, seg(s.sort === v)));
+    const setRt = (v) => this.setState({ rt: Object.assign({}, this.state.rt, { [curP.n]: v }) });
+    const starBtns = [1, 2, 3, 4, 5].map((v) => ({ label: v + ' 星', pressed: curP.stars >= v ? 'true' : 'false', color: curP.stars >= v ? '#f2c230' : c.starOff, pick: () => setRt(curP.stars === v ? 0 : v) }));
+    const curLb = s.lb[curP.n] || 'none';
+    const LABELS = [['none', '无色标', c.well], ['red', '红色', '#e0574f'], ['yellow', '黄色', '#e8c34a'], ['green', '绿色', '#5fb36b'], ['blue', '蓝色', '#4a8fe0'], ['purple', '紫色', '#9a6ad6']];
+    const labelBtns = LABELS.map(([id, label, color]) => ({ label, color, pressed: curLb === id ? 'true' : 'false', ring: curLb === id ? c.text : (id === 'none' ? c.muted : 'transparent'), pick: () => this.setState({ lb: Object.assign({}, this.state.lb, { [curP.n]: id }) }) }));
+    const isRej = !!s.rej[curP.n];
+    const nSel = pickedKeys.length;
+    const MODALS = {
+      import: {
+        title: '从存储卡导入', desc: '存储卡 · Z 8 · 发现 412 张新照片（含 31 组 NEF + JPEG）',
+        groups: [
+          ['range', '导入范围', [['new', '仅新照片'], ['all', '全部照片']]],
+          ['dest', '存放位置', [['date', 'D:\\照片\\按日期'], ['pick', '选择文件夹…']]],
+          ['rename', '文件名', [['keep', '保持原名'], ['date', '日期_原名']]],
+          ['pair', 'NEF + JPEG', [['both', '都导入'], ['nef', '只导入 NEF']]],
+          ['backup', '同时备份', [['off', '不备份'], ['on', '备份到 [第二块硬盘]']]],
+          ['album', '加入相册', [['none', '不加入'], ['tidy', '待整理']]]
+        ],
+        note: '导入只复制文件，存储卡上的原文件保持不变。', ok: '导入 412 张'
+      },
+      export: {
+        title: '导出', desc: '导出已选的 ' + nSel + ' 张，套用全部编辑参数（包括只在 NICE 中生效的效果）',
+        groups: [
+          ['fmt', '格式', [['jpg', 'JPEG'], ['tif', 'TIFF 16 位'], ['heif', 'HEIF']]],
+          ['size', '尺寸', [['full', '原尺寸'], ['3840', '长边 3840 px'], ['2048', '长边 2048 px']]],
+          ['cs', '色彩空间', [['srgb', 'sRGB'], ['argb', 'Adobe RGB']]],
+          ['sharp', '输出锐化', [['none', '无'], ['screen', '屏幕'], ['print', '打印']]],
+          ['meta', '元数据', [['all', '全部'], ['copy', '仅版权'], ['nogps', '去除位置']]],
+          ['name', '文件名', [['orig', '原文件名'], ['seq', '日期_序号']]]
+        ],
+        note: '导出到 D:\\导出\\京都 · 原始文件不变', ok: '导出 ' + nSel + ' 张'
+      }
+    };
+
+    const exif = [
+      ['相机', 'Nikon Z 8'], ['镜头', 'NIKKOR Z 24-70mm f/2.8 S'], ['焦距', '52 mm'],
+      ['光圈', 'f/4'], ['快门', '1/320 s'], ['ISO', '200'], ['曝光补偿', '−0.3 EV'],
+      ['白平衡', '自动 1'], ['优化校准', '标准'], ['拍摄时间', '2026-10-12 15:42:08'], ['位置', '京都 · 岚山']
+    ].map(([k, v]) => ({ k, v }));
+    const jpg = (curP.pair && s.pairView === 'JPG') || curP.type === 'JPG';
+    const pairOpts = [['NEF', 'NEF · 52.3 MB'], ['JPG', 'JPEG · 18.6 MB']].map(([id, label]) => Object.assign({ label, pick: () => this.setState({ pairView: id }) }, seg(s.pairView === id)));
+    const memChips = defs.filter((d) => !d.kids && !d.smart && (s.mem[d.id] || []).indexOf(curP.n) >= 0).map((d) => ({ name: d.name }));
+    const posIdx = order.indexOf(s.cur);
+    return Object.assign({}, sh, src, this.modalVals(c, MODALS), {
+      folderRows, albumTree, ca, starOpts, fltToggles, exif, pairOpts, memChips, curP,
+      dispToggles, sortOpts, starBtns, labelBtns,
+      rejPressed: isRej ? 'true' : 'false', rejBorder: isRej ? '#e0574f' : c.ctl, rejColor: isRej ? '#e0574f' : c.text,
+      toggleRej: () => this.setState({ rej: Object.assign({}, this.state.rej, { [curP.n]: !isRej }) }),
+      zoomed: s.zoom, zoomTf: s.zoom ? 'scale(3)' : 'none', zoomCursor: s.zoom ? 'zoom-out' : 'zoom-in',
+      toggleZoom: () => this.setState({ zoom: !this.state.zoom }),
+      openImport: () => this.setState({ modal: 'import' }),
+      openExport: () => this.setState({ modal: 'export' }),
+      folderHint: s.src === 'folder',
+      msg: s.msg, msgOn: !!s.msg,
+      q: s.flt.q, setQ: (e) => setF({ q: e.target.value }),
+      noMem: memChips.length === 0,
+      hasCur: true, curName: 'DSC_' + curP.n,
+      strip, stripEmpty: strip.length === 0, stripCount: strip.length,
+      emptyText: '当前来源和筛选条件下没有照片',
+      posLabel: posIdx >= 0 ? (posIdx + 1) + ' / ' + order.length : order.length + ' 张',
+      pickedCount: pickedKeys.length,
+      selectAll: () => { const p = {}; order.forEach((k) => { p[k] = true; }); this.setState({ picked: p }); },
+      clearSel: () => this.setState({ picked: {} }),
+      detail: {
+        pair: curP.pair,
+        name: curP.pair ? 'DSC_' + curP.n + ' · NEF + JPEG' : curP.name,
+        size: jpg ? '8256 × 5504 · JPEG 精细 · 18.6 MB' : '8256 × 5504 · 14 位 RAW · 52.3 MB',
+        edits: curP.edited ? '已编辑 · 曝光、色温等 5 项' : '尚未编辑',
+        dot: curP.edited ? '#f2c230' : c.off
+      }
+    });
+  }
+}
+</script>
+</body>
+</html>

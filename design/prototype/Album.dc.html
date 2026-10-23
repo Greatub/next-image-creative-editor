@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>NICE 相册 · 版面编排</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;600&amp;family=Noto+Serif+SC:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#f2c230}a:hover{color:#ffd95a}
+button,input{font:inherit;color:inherit}
+</style>
+</helmet>
+<div onMouseMove="{{onMove}}" style="width: 100%; height: 100vh; min-height: 720px; position: relative; overflow: hidden; display: flex; flex-direction: column; cursor: {{cursor}}; background: {{c.bg}}; color: {{c.text}}; font-family: Inter, 'Noto Sans SC', system-ui, sans-serif; font-size: 13px">
+
+  <header onMouseLeave="{{T.leave}}" style="position: {{T.pos}}; top: 0; left: 0; right: 0; z-index: 30; transform: {{T.tf}}; transition: transform 160ms ease; box-shadow: {{T.shadow}}; height: 48px; flex: none; box-sizing: border-box; display: flex; align-items: center; gap: 16px; padding: 0 12px 0 16px; background: {{c.panel}}; border-bottom: 1px solid {{c.line}}">
+    <div style="display: flex; align-items: center; gap: 8px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f2c230" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 3l3 7M21 12l-7 3M12 21l-3-7M3 12l7-3"></path></svg>
+      <span style="font-weight: 700; letter-spacing: 0.12em; font-size: 15px">NICE</span>
+    </div>
+    <nav aria-label="主视图" style="display: flex; gap: 2px; background: {{c.well}}; padding: 3px; border-radius: 8px">
+      <a href="Main.dc.html" style="padding: 6px 16px; border-radius: 6px; color: {{c.sub}}; text-decoration: none">浏览</a>
+      <a href="Edit.dc.html" style="padding: 6px 16px; border-radius: 6px; color: {{c.sub}}; text-decoration: none">编辑</a>
+      <a href="Album.dc.html" aria-current="page" style="padding: 6px 16px; border-radius: 6px; background: #f2c230; color: #141518; text-decoration: none; font-weight: 600">相册</a>
+      <a href="Print.dc.html" style="padding: 6px 16px; border-radius: 6px; color: {{c.sub}}; text-decoration: none">打印</a>
+    </nav>
+    <div style="flex: 1"></div>
+    <button aria-label="撤销" style="width: 34px; height: 32px; border: 1px solid {{c.ctl}}; border-radius: 6px; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 14L4 9l5-5"></path><path d="M4 9h11a5 5 0 0 1 0 10h-3"></path></svg>
+    </button>
+    <button aria-label="重做" style="width: 34px; height: 32px; border: 1px solid {{c.ctl}}; border-radius: 6px; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 14l5-5-5-5"></path><path d="M20 9H9a5 5 0 0 0 0 10h3"></path></svg>
+    </button>
+    <button onClick="{{openBook}}" style="min-width: 112px; height: 32px; padding: 0 14px; border: 0; border-radius: 6px; background: #f2c230; color: #141518; font-weight: 600; cursor: pointer">导出打印稿</button>
+    <div style="position: relative">
+      <button aria-label="设置" aria-expanded="{{gearExpanded}}" onClick="{{toggleGear}}" style="width: 34px; height: 32px; border: 0; border-radius: 6px; background: {{gearBg}}; cursor: pointer; display: flex; align-items: center; justify-content: center">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9L7 7M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg>
+      </button>
+      <sc-if value="{{gearOpen}}" hint-placeholder-val="{{ false }}">
+        <div role="dialog" aria-label="设置" style="position: absolute; right: 0; top: calc(100% + 8px); width: 240px; padding: 12px; box-sizing: border-box; background: {{c.panel}}; border: 1px solid {{c.line}}; border-radius: 10px; box-shadow: 0 12px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 8px; z-index: 50">
+          <span style="font-size: 11px; letter-spacing: 0.08em; color: {{c.dim}}">界面主题</span>
+          <div role="group" aria-label="界面主题" style="display: flex; gap: 2px; background: {{c.well}}; padding: 3px; border-radius: 8px">
+            <sc-for list="{{themes}}" as="t" hint-placeholder-count="2">
+              <button aria-pressed="{{t.pressed}}" onClick="{{t.pick}}" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 28px; border: 0; border-radius: 6px; background: {{t.bg}}; cursor: pointer">
+                <span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 5px; background: {{t.swatch}}; border: 1px solid #9a9a9a"></span>{{t.label}}
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </header>
+  <sc-if value="{{T.hot}}" hint-placeholder-val="{{ false }}">
+    <div aria-hidden="true" onMouseEnter="{{T.enter}}" style="position: absolute; top: 0; left: 0; right: 0; height: 6px; z-index: 29"></div>
+  </sc-if>
+
+  <div style="flex: 1; min-height: 0; display: flex; position: relative">
+
+    <aside aria-label="相册预览" onMouseLeave="{{L.leave}}" style="position: {{L.pos}}; top: 0; bottom: 0; left: 0; z-index: 20; width: 300px; flex: none; box-sizing: border-box; transform: {{L.tf}}; transition: transform 160ms ease; box-shadow: {{L.shadow}}; background: {{c.panel}}; border-right: 1px solid {{c.line}}; overflow-y: auto; padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <span style="font-weight: 600">相册预览</span>
+        <div style="display: flex; gap: 4px">
+          <button onClick="{{delSpread}}" disabled="{{noDel}}" title="{{delTip}}" style="min-height: 26px; padding: 0 8px; border: 1px solid {{c.ctl}}; border-radius: 6px; background: transparent; color: {{delColor}}; cursor: pointer; font-size: 12px">删除跨页</button>
+          <button onClick="{{addSpread}}" style="min-height: 26px; padding: 0 8px; border: 1px solid {{c.ctl}}; border-radius: 6px; background: transparent; cursor: pointer; font-size: 12px">+ 跨页</button>
+        </div>
+      </div>
+      <span style="font-size: 12px; color: {{c.muted}}">{{sizeLabel}}</span>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 10px">
+        <sc-for list="{{thumbs}}" as="th" hint-placeholder-count="6">
+          <button aria-pressed="{{th.pressed}}" aria-label="{{th.label}}" onClick="{{th.pick}}" style="padding: 0; border: 0; background: transparent; cursor: pointer; display: flex; flex-direction: column; gap: 5px; align-items: stretch">
+            <span style="display: block; aspect-ratio: {{spreadRatio}}; background: #ffffff; border-radius: 2px; outline: 2px solid {{th.ring}}; outline-offset: 2px; position: relative; overflow: hidden">
+              <sc-for list="{{th.boxes}}" as="bx" hint-placeholder-count="2">
+                <span style="position: absolute; left: {{bx.x}}; top: {{bx.y}}; width: {{bx.w}}; height: {{bx.h}}; background: {{bx.bg}}"></span>
+              </sc-for>
+              <span style="position: absolute; left: 50%; top: 0; bottom: 0; border-left: 1px solid rgba(0,0,0,0.12)"></span>
+            </span>
+            <span style="font-size: 12px; text-align: center; color: {{th.fg}}">{{th.label}}</span>
+          </button>
+        </sc-for>
+      </div>
+    </aside>
+    <sc-if value="{{L.hot}}" hint-placeholder-val="{{ false }}">
+      <div aria-hidden="true" onMouseEnter="{{L.enter}}" style="position: absolute; top: 0; bottom: 0; left: 0; width: 6px; z-index: 19"></div>
+    </sc-if>
+
+    <main style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+      <section aria-label="版面" style="flex: 1; min-height: 0; position: relative; background: {{c.stage}}">
+        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 32px 32px 72px; box-sizing: border-box">
+          <div style="width: 100%; max-height: 100%; aspect-ratio: {{spreadRatio}}; position: relative; background: #ffffff; box-shadow: 0 10px 40px rgba(0,0,0,0.45)">
+            <sc-for list="{{slots}}" as="sl" hint-placeholder-count="2">
+              <div onDragOver="{{sl.over}}" onDrop="{{sl.drop}}" style="position: absolute; left: {{sl.x}}; top: {{sl.y}}; width: {{sl.w}}; height: {{sl.h}}">
+                <sc-if value="{{sl.filled}}" hint-placeholder-val="{{ true }}">
+                  <svg viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice" role="img" aria-label="{{sl.name}}" style="width: 100%; height: 100%; display: block">
+                    <rect width="300" height="200" fill="{{sl.sky}}"></rect>
+                    <circle cx="210" cy="70" r="22" fill="{{sl.sun}}"></circle>
+                    <path d="M0 140 L60 90 L110 125 L170 70 L230 120 L300 85 L300 200 L0 200Z" fill="{{sl.far}}"></path>
+                    <path d="M0 170 L80 135 L150 160 L220 128 L300 155 L300 200 L0 200Z" fill="{{sl.near}}"></path>
+                  </svg>
+                  <button aria-label="从版面移出 {{sl.name}}" onClick="{{sl.clear}}" style="position: absolute; right: 8px; top: 8px; width: 28px; height: 28px; border: 0; border-radius: 14px; background: rgba(15,16,18,0.78); color: #f2f2f2; cursor: pointer">×</button>
+                </sc-if>
+                <sc-if value="{{sl.empty}}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{sl.place}}" style="width: 100%; height: 100%; border: 2px dashed #b9b9b9; background: #f3f3f3; color: #555555; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1.5"></rect><path d="M12 9v6M9 12h6"></path></svg>
+                    <span style="font-size: 12px">从底栏拖入照片，或点击放入当前照片</span>
+                  </button>
+                </sc-if>
+              </div>
+            </sc-for>
+            <sc-for list="{{caps}}" as="cp" hint-placeholder-count="1">
+              <div style="position: absolute; left: {{cp.x}}; top: {{cp.y}}; width: {{cp.w}}; color: #1d1d1f; display: flex; flex-direction: column; gap: 4px">
+                <input aria-label="图注标题" title="点击直接编辑" value="{{cp.title}}" onChange="{{cp.setTitle}}" style="width: 100%; padding: 0; border: 0; background: transparent; font-family: 'Noto Serif SC', serif; font-size: 20px; font-weight: 600; color: #1d1d1f; outline-color: #2f7bf5">
+                <input aria-label="图注说明" title="点击直接编辑" value="{{cp.sub}}" onChange="{{cp.setSub}}" style="width: 100%; padding: 0; border: 0; background: transparent; font-size: 11px; color: #555555; outline-color: #2f7bf5">
+              </div>
+            </sc-for>
+            <sc-if value="{{cropPreview}}" hint-placeholder-val="{{ false }}">
+              <div aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 0; height: {{gm.by}}; background: {{c.stage}}"></div>
+              <div aria-hidden="true" style="position: absolute; left: 0; right: 0; bottom: 0; height: {{gm.by}}; background: {{c.stage}}"></div>
+              <div aria-hidden="true" style="position: absolute; left: 0; top: 0; bottom: 0; width: {{gm.bx}}; background: {{c.stage}}"></div>
+              <div aria-hidden="true" style="position: absolute; right: 0; top: 0; bottom: 0; width: {{gm.bx}}; background: {{c.stage}}"></div>
+            </sc-if>
+            <sc-if value="{{showBleed}}" hint-placeholder-val="{{ true }}">
+              <div aria-hidden="true" style="position: absolute; inset: 0; border: 1px dashed #e0574f; pointer-events: none"></div>
+            </sc-if>
+            <sc-if value="{{showTrim}}" hint-placeholder-val="{{ true }}">
+              <div aria-hidden="true" style="position: absolute; left: {{gm.bx}}; right: {{gm.bx}}; top: {{gm.by}}; bottom: {{gm.by}}; border: 1px solid #111111; box-shadow: 0 0 0 1px rgba(255,255,255,0.7); pointer-events: none"></div>
+            </sc-if>
+            <sc-if value="{{showSafe}}" hint-placeholder-val="{{ true }}">
+              <div aria-hidden="true" style="position: absolute; left: {{gm.sx1}}; top: {{gm.sy}}; width: {{gm.sw}}; height: {{gm.sh}}; border: 1px dashed #2f7bf5; pointer-events: none"></div>
+              <div aria-hidden="true" style="position: absolute; left: {{gm.sx2}}; top: {{gm.sy}}; width: {{gm.sw}}; height: {{gm.sh}}; border: 1px dashed #2f7bf5; pointer-events: none"></div>
+            </sc-if>
+            <sc-if value="{{showGutter}}" hint-placeholder-val="{{ true }}">
+              <div aria-hidden="true" style="position: absolute; left: 50%; top: 0; bottom: 0; border-left: 1px dashed #9a9a9a; pointer-events: none"></div>
+            </sc-if>
+          </div>
+        </div>
+        <div style="position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 5; display: flex; align-items: center; gap: 12px; background: {{c.chip}}; border-radius: 8px; padding: 4px 6px; white-space: nowrap">
+          <button aria-label="上一跨页" onClick="{{prevSpread}}" style="width: 32px; height: 30px; border: 0; border-radius: 6px; background: transparent; cursor: pointer">‹</button>
+          <span>{{spreadLabel}}</span>
+          <button aria-label="下一跨页" onClick="{{nextSpread}}" style="width: 32px; height: 30px; border: 0; border-radius: 6px; background: transparent; cursor: pointer">›</button>
+        </div>
+
+        <sc-if value="{{expand}}" hint-placeholder-val="{{ false }}">
+          <div role="region" aria-label="展开的照片网格" style="position: absolute; inset: 0; z-index: 12; background: {{c.bg}}; display: flex; flex-direction: column">
+            <div style="height: 44px; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 16px; border-bottom: 1px solid {{c.line}}">
+              <span style="font-weight: 600">{{srcName}} · {{stripTitle}}</span>
+              <span style="color: {{c.muted}}">{{stripCount}} 张</span>
+              <div style="flex: 1"></div>
+              <button onClick="{{selectAll}}" style="min-height: 28px; padding: 0 12px; border: 1px solid {{c.ctl}}; border-radius: 6px; background: transparent; cursor: pointer">全选</button>
+              <button onClick="{{clearSel}}" style="min-height: 28px; padding: 0 12px; border: 1px solid {{c.ctl}}; border-radius: 6px; background: transparent; cursor: pointer">清除选择</button>
+            </div>
+            <div style="flex: 1; min-height: 0; overflow: auto; padding: 16px; box-sizing: border-box; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px 12px; align-content: start">
+              <sc-for list="{{strip}}" as="g" hint-placeholder-count="12">
+                <button aria-pressed="{{g.pressed}}" aria-label="{{g.name}}" onClick="{{g.click}}" draggable="true" onDragStart="{{g.drag}}" style="padding: 0; border: 0; background: transparent; cursor: pointer; text-align: left; display: flex; flex-direction: column; gap: 6px">
+                  <span style="position: relative; display: block; border-radius: 4px; overflow: hidden; outline: 2px solid {{g.ring}}; outline-offset: 2px">
+                    <svg viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="width: 100%; aspect-ratio: 3 / 2; display: block">
+                      <rect width="300" height="200" fill="{{g.sky}}"></rect>
+                      <circle cx="210" cy="70" r="22" fill="{{g.sun}}"></circle>
+                      <path d="M0 140 L60 90 L110 125 L170 70 L230 120 L300 85 L300 200 L0 200Z" fill="{{g.far}}"></path>
+                      <path d="M0 170 L80 135 L150 160 L220 128 L300 155 L300 200 L0 200Z" fill="{{g.near}}"></path>
+                    </svg>
+                    <sc-if value="{{g.isUsed}}" hint-placeholder-val="{{ false }}">
+                      <span style="position: absolute; left: 6px; top: 6px; font-size: 10px; font-weight: 600; padding: 1px 5px; border-radius: 3px; background: rgba(15,16,18,0.78); color: #f2c230">{{g.usedLabel}}</span>
+                    </sc-if>
+                  </span>
+                  <span style="display: flex; justify-content: space-between; font-size: 12px; color: {{g.fg}}">{{g.name}}<span style="color: #f2c230">{{g.on}}</span></span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <div onMouseEnter="{{ctlEnter}}" onMouseLeave="{{ctlLeave}}" style="position: absolute; right: 24px; bottom: 24px; z-index: 15; opacity: {{ctlOpacity}}; pointer-events: {{ctlPE}}; transition: opacity 300ms ease; display: flex; align-items: center; gap: 2px; padding: 4px; border-radius: 10px; background: {{c.chip}}; box-shadow: 0 4px 18px rgba(0,0,0,0.35)">
+          <div role="group" aria-label="显示方式" style="display: flex; gap: 2px">
+            <sc-for list="{{modes}}" as="m" hint-placeholder-count="3">
+              <button aria-pressed="{{m.pressed}}" onClick="{{m.pick}}" title="{{m.tip}}" style="display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px; border: 0; border-radius: 7px; background: {{m.bg}}; color: {{m.fg}}; cursor: pointer; font-size: 12px">
+                <svg width="20" height="15" viewBox="0 0 22 16" aria-hidden="true"><rect x="1" y="1" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"></rect><rect x="1" y="1" width="20" height="3" fill="currentColor" fill-opacity="{{m.t}}"></rect><rect x="1" y="1" width="4" height="14" fill="currentColor" fill-opacity="{{m.l}}"></rect><rect x="17" y="1" width="4" height="14" fill="currentColor" fill-opacity="{{m.r}}"></rect><rect x="1" y="11" width="20" height="4" fill="currentColor" fill-opacity="{{m.b}}"></rect></svg>
+                {{m.label}}
+              </button>
+            </sc-for>
+          </div>
+          <span aria-hidden="true" style="width: 1px; height: 20px; background: {{c.line}}; margin: 0 4px"></span>
+          <button aria-pressed="{{fullPressed}}" aria-label="{{fullLabel}}" title="{{fullLabel}}" onClick="{{toggleFull}}" style="width: 36px; height: 32px; border: 0; border-radius: 7px; background: {{fullBg}}; color: {{fullFg}}; cursor: pointer; display: flex; align-items: center; justify-content: center">
+            <sc-if value="{{full}}" hint-placeholder-val="{{ false }}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"></path></svg>
+            </sc-if>
+            <sc-if value="{{notFull}}" hint-placeholder-val="{{ true }}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg>
+            </sc-if>
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <aside aria-label="版面设置" onMouseLeave="{{R.leave}}" style="position: {{R.pos}}; top: 0; bottom: 0; right: 0; z-index: 20; width: 300px; flex: none; box-sizing: border-box; transform: {{R.tf}}; transition: transform 160ms ease; box-shadow: {{R.shadow}}; background: {{c.panel}}; border-left: 1px solid {{c.line}}; overflow-y: auto; padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 18px">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline">
+          <span style="font-weight: 600">模板</span>
+          <button style="border: 0; background: transparent; color: #f2c230; cursor: pointer; font-size: 12px; padding: 4px 0">自定义模板…</button>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+          <sc-for list="{{templates}}" as="tp" hint-placeholder-count="3">
+            <button aria-pressed="{{tp.pressed}}" onClick="{{tp.pick}}" style="padding: 0; border: 0; background: transparent; cursor: pointer; display: flex; flex-direction: column; gap: 4px; align-items: stretch">
+              <span style="display: block; aspect-ratio: 2 / 1; background: #ffffff; border-radius: 2px; outline: 2px solid {{tp.ring}}; outline-offset: 1px; position: relative; overflow: hidden">
+                <sc-for list="{{tp.boxes}}" as="bx" hint-placeholder-count="2">
+                  <span style="position: absolute; left: {{bx.x}}; top: {{bx.y}}; width: {{bx.w}}; height: {{bx.h}}; background: {{bx.bg}}"></span>
+                </sc-for>
+              </span>
+              <span style="font-size: 11px; text-align: center; color: {{tp.fg}}">{{tp.label}}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <span style="font-weight: 600; margin-bottom: 4px">参考线</span>
+        <sc-for list="{{guideOpts}}" as="g" hint-placeholder-count="5">
+          <button aria-pressed="{{g.pressed}}" onClick="{{g.toggle}}" style="display: flex; align-items: center; gap: 10px; min-height: 30px; padding: 0; border: 0; background: transparent; cursor: pointer">
+            <span aria-hidden="true" style="width: 18px; height: 0; border-top: 2px {{g.lineStyle}} {{g.color}}"></span>
+            <span style="flex: 1; text-align: left">{{g.label}}</span>
+            <span aria-hidden="true" style="width: 34px; height: 20px; border-radius: 10px; background: {{g.track}}; position: relative; display: block">
+              <span style="position: absolute; top: 2px; left: {{g.knob}}; width: 16px; height: 16px; border-radius: 8px; background: #ffffff; display: block"></span>
+            </span>
+          </button>
+        </sc-for>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <span style="font-weight: 600">版面设置</span>
+        <span style="font-size: 12px; color: {{c.sub}}">成品尺寸（cm）</span>
+        <div role="group" aria-label="成品尺寸" style="display: flex; gap: 4px; flex-wrap: wrap">
+          <sc-for list="{{sizeOpts}}" as="o" hint-placeholder-count="4">
+            <button aria-pressed="{{o.pressed}}" onClick="{{o.pick}}" style="min-height: 28px; padding: 0 10px; border-radius: 6px; border: 1px solid {{o.border}}; background: transparent; color: {{o.color}}; cursor: pointer; font-size: 12px">{{o.label}}</button>
+          </sc-for>
+        </div>
+        <dl style="margin: 0; display: grid; grid-template-columns: 1fr auto; row-gap: 6px; font-size: 12px">
+          <dt style="color: {{c.muted}}">出血</dt><dd style="margin: 0">3 mm</dd>
+          <dt style="color: {{c.muted}}">安全距离</dt><dd style="margin: 0">5 mm</dd>
+          <dt style="color: {{c.muted}}">装订</dt><dd style="margin: 0">胶装 · 书脊 9 mm</dd>
+          <dt style="color: {{c.muted}}">印厂预设</dt><dd style="margin: 0">[印厂名称]</dd>
+        </dl>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <span style="font-weight: 600">输出前检查</span>
+        <sc-for list="{{checks}}" as="ck" hint-placeholder-count="4">
+          <div style="display: flex; align-items: flex-start; gap: 8px; font-size: 12px">
+            <span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 4px; margin-top: 4px; background: {{ck.color}}; flex: none"></span>
+            <span style="color: {{c.sub}}">{{ck.text}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </aside>
+    <sc-if value="{{R.hot}}" hint-placeholder-val="{{ false }}">
+      <div aria-hidden="true" onMouseEnter="{{R.enter}}" style="position: absolute; top: 0; bottom: 0; right: 0; width: 6px; z-index: 19"></div>
+    </sc-if>
+  </div>
+
+  <footer aria-label="待选照片" onMouseLeave="{{B.leave}}" style="position: {{B.pos}}; bottom: 0; left: 0; right: 0; z-index: 30; transform: {{B.tf}}; transition: transform 160ms ease; box-shadow: {{B.shadow}}; height: 108px; flex: none; box-sizing: border-box; display: flex; align-items: center; gap: 16px; padding: 0 16px; background: {{c.panel}}; border-top: 1px solid {{c.line}}">
+    <div style="width: 236px; flex: none; display: flex; flex-direction: column; gap: 6px">
+      <div style="display: flex; gap: 6px; align-items: center">
+        <div aria-label="当前来源" title="来源在浏览页左栏选择" style="flex: 1; min-width: 0; min-height: 32px; padding: 0 10px; box-sizing: border-box; border-radius: 6px; background: {{c.well}}; display: flex; align-items: center; gap: 6px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f2c230" stroke-width="1.8" aria-hidden="true" style="flex: none"><rect x="3" y="7" width="14" height="13" rx="1.5"></rect><path d="M7 4h12a2 2 0 0 1 2 2v11"></path></svg>
+          <span style="flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{srcName}}</span>
+        </div>
+      </div>
+      <span style="color: {{c.muted}}; font-size: 12px">{{stripTitle}} · {{stripCount}} 张</span>
+      <button aria-pressed="{{usedPressed}}" onClick="{{toggleUsed}}" style="display: flex; align-items: center; gap: 8px; min-height: 22px; padding: 0; border: 0; background: transparent; cursor: pointer; font-size: 11px; color: {{c.dim}}">
+        <span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; border: 1.5px solid {{usedBorder}}; background: {{usedBox}}"></span>
+        显示已用照片
+      </button>
+    </div>
+    <sc-if value="{{stripEmpty}}" hint-placeholder-val="{{ false }}">
+      <div style="flex: 1; color: {{c.muted}}; text-align: center">相册里的照片都已放入版面</div>
+    </sc-if>
+    <div role="group" aria-label="待选照片条" style="flex: 1; min-width: 0; display: flex; gap: 8px; overflow-x: auto; padding: 6px 2px">
+      <sc-for list="{{strip}}" as="s" hint-placeholder-count="10">
+        <button aria-pressed="{{s.pressed}}" aria-label="{{s.name}}" onClick="{{s.click}}" draggable="true" onDragStart="{{s.drag}}" style="flex: 0 0 100px; padding: 0; border: 0; background: transparent; cursor: pointer; display: flex; flex-direction: column; gap: 4px">
+          <span style="position: relative; display: block; height: 66px; border-radius: 4px; overflow: hidden; outline: 2px solid {{s.ring}}; outline-offset: 1px; opacity: {{s.op}}">
+            <svg viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="width: 100%; height: 100%; display: block">
+              <rect width="300" height="200" fill="{{s.sky}}"></rect>
+              <circle cx="210" cy="70" r="22" fill="{{s.sun}}"></circle>
+              <path d="M0 140 L60 90 L110 125 L170 70 L230 120 L300 85 L300 200 L0 200Z" fill="{{s.far}}"></path>
+              <path d="M0 170 L80 135 L150 160 L220 128 L300 155 L300 200 L0 200Z" fill="{{s.near}}"></path>
+            </svg>
+            <sc-if value="{{s.isUsed}}" hint-placeholder-val="{{ false }}">
+              <span style="position: absolute; left: 4px; top: 4px; font-size: 9px; font-weight: 600; padding: 0 4px; border-radius: 3px; background: rgba(15,16,18,0.78); color: #f2c230">{{s.usedLabel}}</span>
+            </sc-if>
+          </span>
+          <span style="font-size: 11px; color: {{s.fg}}; display: flex; justify-content: space-between">{{s.short}}<span style="color: #f2c230">{{s.on}}</span></span>
+        </button>
+      </sc-for>
+    </div>
+    <div style="width: 96px; flex: none; display: flex; flex-direction: column; gap: 6px">
+      <span style="text-align: center; color: {{c.muted}}; font-size: 12px">已选 {{pickedCount}}</span>
+      <button aria-pressed="{{expandPressed}}" onClick="{{toggleExpand}}" style="min-height: 30px; border: 1px solid {{expandBorder}}; border-radius: 6px; background: transparent; color: {{expandColor}}; cursor: pointer">{{expandLabel}}</button>
+    </div>
+  </footer>
+  <sc-if value="{{B.hot}}" hint-placeholder-val="{{ false }}">
+    <div aria-hidden="true" onMouseEnter="{{B.enter}}" style="position: absolute; bottom: 0; left: 0; right: 0; height: 6px; z-index: 29"></div>
+  </sc-if>
+  <sc-if value="{{modalOpen}}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-modal="true" aria-label="{{modal.title}}" style="position: absolute; inset: 0; z-index: 60; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center">
+      <div style="width: 600px; max-width: calc(100% - 32px); max-height: calc(100% - 64px); overflow-y: auto; background: {{c.panel}}; border: 1px solid {{c.line}}; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <span style="font-size: 16px; font-weight: 600">{{modal.title}}</span>
+          <button aria-label="关闭" onClick="{{closeModal}}" style="width: 32px; height: 32px; border: 0; border-radius: 6px; background: transparent; color: {{c.muted}}; cursor: pointer; font-size: 18px">×</button>
+        </div>
+        <span style="color: {{c.muted}}">{{modal.desc}}</span>
+        <sc-for list="{{modal.groups}}" as="mg" hint-placeholder-count="5">
+          <div style="display: grid; grid-template-columns: 112px 1fr; align-items: center; gap: 12px">
+            <span style="color: {{c.sub}}">{{mg.title}}</span>
+            <div role="group" aria-label="{{mg.title}}" style="display: flex; gap: 2px; background: {{c.well}}; padding: 3px; border-radius: 8px">
+              <sc-for list="{{mg.opts}}" as="o" hint-placeholder-count="3">
+                <button aria-pressed="{{o.pressed}}" onClick="{{o.pick}}" style="flex: 1; min-height: 28px; padding: 0 8px; border: 0; border-radius: 6px; background: {{o.bg}}; color: {{o.fg}}; cursor: pointer; font-size: 12px; white-space: nowrap">{{o.label}}</button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+        <span style="font-size: 12px; color: {{modalNoteColor}}">{{modal.note}}</span>
+        <div style="display: flex; justify-content: flex-end; gap: 8px">
+          <button onClick="{{closeModal}}" style="min-height: 34px; padding: 0 16px; border: 1px solid {{c.ctl}}; border-radius: 6px; background: transparent; cursor: pointer">取消</button>
+          <button onClick="{{closeModal}}" style="min-height: 34px; padding: 0 18px; border: 0; border-radius: 6px; background: #f2c230; color: #141518; font-weight: 600; cursor: pointer">{{modal.ok}}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","gray"],"default":"dark"},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      theme: props.theme === 'gray' ? 'gray' : 'dark',
+      mode: 'std', full: false, active: true, gear: false, expand: false,
+      hov: { top: false, bottom: false, left: false, right: false },
+      cur: 'DSC_0426', picked: { DSC_0426: true },
+      showUsed: false, spread: 2, size: 'sq20', modal: null, mopt: {},
+      spreads: [
+        { tpl: 'B', placed: { s0: '0421' }, text: {} },
+        { tpl: 'A', placed: { s0: '0420', s1: '0423' }, text: { t0: '京都', s0: '2026 年 10 月 · 秋叶与旧城' } },
+        { tpl: 'C', placed: { s0: '0428' }, text: {} },
+        { tpl: 'A', placed: {}, text: {} },
+        { tpl: 'B', placed: {}, text: {} }
+      ],
+      guides: { bleed: true, trim: true, safe: true, gutter: true, crop: false }
+    };
+    this.overCtl = false;
+    this.t = null;
+    this.dragKey = null;
+    this.onFs = () => this.setState({ full: !!document.fullscreenElement });
+  }
+  componentDidMount() { this.poke(); document.addEventListener('fullscreenchange', this.onFs); }
+  componentWillUnmount() { clearTimeout(this.t); document.removeEventListener('fullscreenchange', this.onFs); }
+  componentDidUpdate(prev) {
+    if (prev.theme !== this.props.theme && (this.props.theme === 'gray' || this.props.theme === 'dark')) this.setState({ theme: this.props.theme });
+  }
+  poke() {
+    if (!this.state.active) this.setState({ active: true });
+    clearTimeout(this.t);
+    this.t = setTimeout(() => { if (!this.overCtl) this.setState({ active: false }); }, 2000);
+  }
+  pick(order, key, e) {
+    const s = this.state;
+    if (e && (e.metaKey || e.ctrlKey)) {
+      const picked = Object.assign({}, s.picked);
+      if (picked[key]) delete picked[key]; else picked[key] = true;
+      this.setState({ picked, cur: key });
+      return;
+    }
+    if (e && e.shiftKey && order.indexOf(s.cur) >= 0) {
+      const a = order.indexOf(s.cur), b = order.indexOf(key);
+      const picked = {};
+      for (let i = Math.min(a, b); i <= Math.max(a, b); i++) picked[order[i]] = true;
+      this.setState({ picked });
+      return;
+    }
+    this.setState({ cur: key, picked: { [key]: true } });
+  }
+  photos() {
+    const P = {
+      autumn: ['#e9b07a', '#a4553a', '#5a2a1f', '#fff1c9'], dusk: ['#3d4a7a', '#6b5a8e', '#22203a', '#f6c27a'],
+      sea: ['#9cc7d9', '#4f8aa3', '#1f4655', '#ffffff'], forest: ['#c9d8b6', '#6f8f5a', '#2f4a2b', '#fff6d8'],
+      night: ['#1b2140', '#3a3f6b', '#0e1022', '#ffd56b'], mono: ['#cfcfcf', '#8a8a8a', '#3a3a3a', '#ffffff'],
+      snow: ['#dfe7ef', '#9fb2c4', '#5b6b7a', '#fffbe8'], sunset: ['#f29b6b', '#c4574a', '#4a1f2a', '#ffe2a8']
+    };
+    const list = [
+      ['0414', 'forest', 3], ['0417', 'snow', 4], ['0418', 'sea', 3], ['0420', 'sunset', 5], ['0421', 'autumn', 4], ['0423', 'autumn', 3],
+      ['0426', 'mono', 4], ['0428', 'dusk', 2], ['0431', 'dusk', 5], ['0433', 'night', 3], ['0436', 'night', 4], ['0440', 'sea', 4]
+    ];
+    return list.map(([n, k, r]) => {
+      const col = P[k];
+      return { n, key: 'DSC_' + n, name: 'DSC_' + n, short: n, stars: r, sky: col[0], far: col[1], near: col[2], sun: col[3], on: '★'.repeat(r) };
+    });
+  }
+  geom() {
+    const SZ = { sq20: [200, 200], p21: [210, 280], l28: [280, 210], sq30: [300, 300] };
+    const W = SZ[this.state.size][0];
+    const H = SZ[this.state.size][1];
+    const b = 3, sf = 5;
+    const TW = 2 * W + 2 * b, TH = H + 2 * b;
+    const px = (v) => (v / TW * 100).toFixed(3) + '%';
+    const py = (v) => (v / TH * 100).toFixed(3) + '%';
+    const iw = W - 2 * sf;
+    const ih = Math.min(iw * 2 / 3, (H - 2 * sf) * 0.62);
+    return {
+      W, H, TW, TH, px, py, b, sf, iw, ih,
+      bx: px(b), by: py(b), sx1: px(b + sf), sx2: px(b + W + sf), sy: py(b + sf), sw: px(iw), sh: py(H - 2 * sf),
+      capY: py(b + sf + ih + 8)
+    };
+  }
+  tplDef(id) {
+    const g = this.geom();
+    const T = {
+      A: { slots: [['s0', '0%', '0%', g.px(g.b + g.W), '100%'], ['s1', g.px(g.b + g.W + g.sf), g.py(g.b + g.sf), g.px(g.iw), g.py(g.ih)]], label: '左满版 + 右图文' },
+      B: { slots: [['s0', '0%', '0%', '100%', '100%']], label: '跨页满版' },
+      C: { slots: [['s0', g.px(g.b + g.sf), g.py(g.b + g.sf), g.px(g.iw), g.py(g.ih)], ['s1', g.px(g.b + g.W + g.sf), g.py(g.b + g.sf), g.px(g.iw), g.py(g.ih)]], label: '双页图注' }
+    };
+    return T[id];
+  }
+  modalVals(c, defs) {
+    const s = this.state;
+    const d = defs[s.modal];
+    const closeModal = () => this.setState({ modal: null });
+    if (!d) return { modalOpen: false, modal: { title: '', desc: '', note: '', ok: '', groups: [] }, closeModal };
+    const groups = d.groups.map(([key, title, opts]) => ({
+      title,
+      opts: opts.map(([v, label]) => {
+        const on = (s.mopt[key] || opts[0][0]) === v;
+        return { label, pressed: on ? 'true' : 'false', bg: on ? c.ctl : 'transparent', fg: on ? '#f2c230' : c.text, pick: () => this.setState({ mopt: Object.assign({}, this.state.mopt, { [key]: v }) }) };
+      })
+    }));
+    return { modalOpen: true, modal: { title: d.title, desc: d.desc, note: d.note, ok: d.ok, groups }, closeModal };
+  }
+  shell() {
+    const s = this.state;
+    const THEMES = {
+      dark: { bg: '#141518', panel: '#1b1c20', stage: '#0f1012', line: '#2a2c31', ctl: '#2f3137', well: '#141518', chip: 'rgba(27,28,32,0.9)', text: '#e6e7ea', sub: '#c9cbd1', muted: '#9a9ca3', dim: '#8b8d94', off: '#3a3d44', starOff: '#45484f', histo: '#8c8f97', ok: '#7fc79a' },
+      gray: { bg: '#3d3d3d', panel: '#474747', stage: '#7a7a7a', line: '#585858', ctl: '#5f5f5f', well: '#3a3a3a', chip: 'rgba(71,71,71,0.94)', text: '#f2f2f2', sub: '#e2e2e2', muted: '#cbcbcb', dim: '#c4c4c4', off: '#6a6a6a', starOff: '#6e6e6e', histo: '#d0d0d0', ok: '#a6e3bb' }
+    };
+    const c = THEMES[s.theme];
+    const HIDE = { top: 'translateY(-100%)', bottom: 'translateY(100%)', left: 'translateX(-100%)', right: 'translateX(100%)' };
+    const fixedIn = (mode, k) => mode === 'std' || (mode === 'focus' && k === 'bottom');
+    const panel = (k) => {
+      const f = fixedIn(s.mode, k);
+      const show = f || s.hov[k] || (k === 'top' && s.gear);
+      return {
+        pos: f ? 'relative' : 'absolute',
+        tf: show ? 'none' : HIDE[k],
+        shadow: f ? 'none' : '0 8px 32px rgba(0,0,0,0.45)',
+        hot: !f,
+        enter: () => this.setState({ hov: Object.assign({}, this.state.hov, { [k]: true }) }),
+        leave: () => { if (!fixedIn(this.state.mode, k)) this.setState({ hov: Object.assign({}, this.state.hov, { [k]: false }) }); }
+      };
+    };
+    const themes = [['dark', '深色', '#1b1c20'], ['gray', '中性灰', '#7a7a7a']].map(([id, label, swatch]) => {
+      const on = s.theme === id;
+      return { label, swatch, pressed: on ? 'true' : 'false', bg: on ? c.ctl : 'transparent', pick: () => this.setState({ theme: id }) };
+    });
+    const MODES = [
+      ['std', '标准', '标准：所有栏固定显示', 1, 1, 1, 1],
+      ['focus', '专注', '专注：仅底部照片条固定，其余栏移到边缘时浮出', 0, 0, 0, 1],
+      ['immersive', '沉浸', '沉浸：所有栏自动隐藏，移到边缘时浮出', 0, 0, 0, 0]
+    ];
+    const modes = MODES.map(([id, label, tip, t, l, r, b]) => {
+      const on = s.mode === id;
+      return {
+        label, tip, t: t ? 0.9 : 0, l: l ? 0.9 : 0, r: r ? 0.9 : 0, b: b ? 0.9 : 0,
+        pressed: on ? 'true' : 'false', bg: on ? '#f2c230' : 'transparent', fg: on ? '#141518' : c.text,
+        pick: () => this.setState({ mode: id, hov: { top: false, bottom: false, left: false, right: false } })
+      };
+    });
+    const shown = s.active || this.overCtl;
+    return {
+      c, themes, modes,
+      T: panel('top'), B: panel('bottom'), L: panel('left'), R: panel('right'),
+      gearOpen: s.gear, gearExpanded: s.gear ? 'true' : 'false', gearBg: s.gear ? c.ctl : 'transparent',
+      toggleGear: () => this.setState({ gear: !this.state.gear }),
+      full: s.full, notFull: !s.full,
+      fullPressed: s.full ? 'true' : 'false',
+      fullLabel: s.full ? '退出全屏（窗口模式）' : '全屏模式',
+      fullBg: s.full ? c.ctl : 'transparent',
+      fullFg: s.full ? '#f2c230' : c.text,
+      toggleFull: () => {
+        try {
+          if (document.fullscreenElement) document.exitFullscreen();
+          else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
+        } catch (err) {}
+        this.setState({ full: !this.state.full });
+      },
+      expand: s.expand, expandPressed: s.expand ? 'true' : 'false', expandLabel: s.expand ? '收起' : '展开',
+      expandBorder: s.expand ? '#f2c230' : c.ctl, expandColor: s.expand ? '#f2c230' : c.text,
+      toggleExpand: () => this.setState({ expand: !this.state.expand }),
+      ctlOpacity: shown ? 1 : 0,
+      ctlPE: shown ? 'auto' : 'none',
+      cursor: s.mode === 'immersive' && !shown ? 'none' : 'default',
+      onMove: () => this.poke(),
+      ctlEnter: () => { this.overCtl = true; this.poke(); },
+      ctlLeave: () => { this.overCtl = false; this.poke(); }
+    };
+  }
+  setPlaced(idx, slotId, n) {
+    const sp = this.state.spreads.map((x) => Object.assign({}, x, { placed: Object.assign({}, x.placed) }));
+    if (n) sp[idx].placed[slotId] = n; else delete sp[idx].placed[slotId];
+    this.setState({ spreads: sp });
+  }
+  renderVals() {
+    const s = this.state;
+    const sh = this.shell();
+    const c = sh.c;
+    const all = this.photos();
+    const byN = {};
+    all.forEach((p) => { byN[p.n] = p; });
+
+    const last = s.spreads.length - 1;
+    const lab = (i) => i === 0 ? '封面' : (i === last ? '封底' : (2 * i) + '–' + (2 * i + 1));
+    const used = {};
+    let emptyTotal = 0;
+    s.spreads.forEach((sp, i) => {
+      const ids = this.tplDef(sp.tpl).slots.map((x) => x[0]);
+      ids.forEach((id) => { const n = sp.placed[id]; if (n) used[n] = (used[n] ? used[n] + '、' : '') + lab(i); else emptyTotal++; });
+    });
+    const list = all.filter((p) => s.showUsed || !used[p.n]);
+    const order = list.map((p) => p.key);
+    const strip = list.map((p) => {
+      const isCur = p.key === s.cur;
+      const pk = !!s.picked[p.key];
+      return Object.assign({}, p, {
+        picked: pk, pressed: pk ? 'true' : 'false',
+        isUsed: !!used[p.n], usedLabel: used[p.n] ? '已用 ' + used[p.n] : '', op: used[p.n] ? 0.55 : 1,
+        ring: isCur ? '#f2c230' : (pk ? 'rgba(242,194,48,0.55)' : 'transparent'),
+        fg: isCur ? '#f2c230' : c.sub,
+        click: (e) => this.pick(order, p.key, e),
+        drag: (e) => { this.dragKey = p.key; try { e.dataTransfer.setData('text/plain', p.key); } catch (err) {} }
+      });
+    });
+
+    const idx = s.spread;
+    const sp = s.spreads[idx];
+    const def = this.tplDef(sp.tpl);
+    const curN = s.cur.replace('DSC_', '');
+    const slots = def.slots.map(([id, x, y, w, h]) => {
+      const n = sp.placed[id];
+      const p = n ? byN[n] : null;
+      return {
+        x, y, w, h, filled: !!p, empty: !p,
+        name: p ? p.name : '', sky: p ? p.sky : '', far: p ? p.far : '', near: p ? p.near : '', sun: p ? p.sun : '',
+        clear: () => this.setPlaced(idx, id, null),
+        place: () => this.setPlaced(idx, id, curN),
+        over: (e) => e.preventDefault(),
+        drop: (e) => { e.preventDefault(); if (this.dragKey) { this.setPlaced(idx, id, this.dragKey.replace('DSC_', '')); this.dragKey = null; } }
+      };
+    });
+    const gm = this.geom();
+    const p0 = byN[sp.placed.s0];
+    const p1 = byN[sp.placed.s1];
+    const tx = sp.text || {};
+    const setText = (k, val) => {
+      const sps = this.state.spreads.map((q) => Object.assign({}, q));
+      sps[idx] = Object.assign({}, sps[idx], { text: Object.assign({}, sps[idx].text || {}, { [k]: val }) });
+      this.setState({ spreads: sps });
+    };
+    const cap = (x, i, dt, ds) => ({
+      x, y: gm.capY, w: gm.sw,
+      title: tx['t' + i] != null ? tx['t' + i] : dt, sub: tx['s' + i] != null ? tx['s' + i] : ds,
+      setTitle: (e) => setText('t' + i, e.target.value), setSub: (e) => setText('s' + i, e.target.value)
+    });
+    let caps = [];
+    if (sp.tpl === 'A') caps = [cap(gm.sx2, 0, '[标题]', '[说明]')];
+    if (sp.tpl === 'C') caps = [
+      cap(gm.sx1, 0, p0 ? p0.name : '[图注]', p0 ? '拍摄于京都' : '放入照片后自动填入拍摄信息'),
+      cap(gm.sx2, 1, p1 ? p1.name : '[图注]', p1 ? '拍摄于京都' : '放入照片后自动填入拍摄信息')
+    ];
+
+    const thumbs = s.spreads.map((x, i) => {
+      const d = this.tplDef(x.tpl);
+      const on = i === idx;
+      return {
+        label: lab(i), pressed: on ? 'true' : 'false', ring: on ? '#f2c230' : 'transparent', fg: on ? '#f2c230' : c.sub,
+        boxes: d.slots.map(([id, bx, by, bw, bh]) => ({ x: bx, y: by, w: bw, h: bh, bg: x.placed[id] ? byN[x.placed[id]].sky : '#dedede' })),
+        pick: () => this.setState({ spread: i })
+      };
+    });
+    const box = (x, y, w, h, bg) => ({ x, y, w, h, bg });
+    const templates = [
+      ['A', [box('0%', '0%', '50%', '100%', '#b9b9b9'), box('54%', '8%', '42%', '56%', '#cfcfcf'), box('54%', '72%', '30%', '6%', '#9a9a9a')]],
+      ['B', [box('0%', '0%', '100%', '100%', '#b9b9b9')]],
+      ['C', [box('4%', '8%', '42%', '56%', '#cfcfcf'), box('54%', '8%', '42%', '56%', '#cfcfcf'), box('4%', '72%', '24%', '6%', '#9a9a9a'), box('54%', '72%', '24%', '6%', '#9a9a9a')]]
+    ].map(([id, boxes]) => {
+      const on = sp.tpl === id;
+      return {
+        label: this.tplDef(id).label, boxes, pressed: on ? 'true' : 'false', ring: on ? '#f2c230' : 'transparent', fg: on ? '#f2c230' : c.sub,
+        pick: () => {
+          const ids = this.tplDef(id).slots.map((q) => q[0]);
+          const sps = this.state.spreads.map((q) => Object.assign({}, q));
+          const kept = {};
+          ids.forEach((k) => { if (sps[idx].placed[k]) kept[k] = sps[idx].placed[k]; });
+          sps[idx] = Object.assign({}, sps[idx], { tpl: id, placed: kept });
+          this.setState({ spreads: sps });
+        }
+      };
+    });
+    const g = s.guides;
+    const GUIDES = [['bleed', '出血线 3 mm', '#e0574f', 'dashed'], ['trim', '裁切线', c.text, 'solid'], ['safe', '安全线 5 mm', '#2f7bf5', 'dashed'], ['gutter', '装订中缝', '#9a9a9a', 'dashed'], ['crop', '裁切后预览', '#f2c230', 'solid']];
+    const guideOpts = GUIDES.map(([k, label, color, ls]) => {
+      const on = !!g[k];
+      return { label, color, lineStyle: ls, pressed: on ? 'true' : 'false', track: on ? '#f2c230' : c.off, knob: on ? '16px' : '2px', toggle: () => this.setState({ guides: Object.assign({}, this.state.guides, { [k]: !on }) }) };
+    });
+    const emptyCount = slots.filter((x) => x.empty).length;
+    const checks = [
+      emptyCount ? { color: '#e8a33c', text: '本跨页还有 ' + emptyCount + ' 个空照片框' } : { color: c.ok, text: '本跨页的照片框都已放好' },
+      { color: c.ok, text: '满版照片已延伸到出血线' },
+      sp.tpl === 'B' ? { color: '#e8a33c', text: '跨页照片经过装订中缝，主体可能被吃进书脊' } : { color: c.ok, text: '没有照片或文字落在装订中缝' },
+      { color: c.ok, text: '有效分辨率最低 312 ppi（≥ 300）' }
+    ];
+    const pages = 2 + (s.spreads.length - 2) * 2;
+    const SIZES = [['sq20', '20 × 20'], ['p21', '21 × 28 竖'], ['l28', '28 × 21 横'], ['sq30', '30 × 30']];
+    const sizeName = SIZES.find((x) => x[0] === s.size)[1];
+    const sizeOpts = SIZES.map(([id, label]) => {
+      const on = s.size === id;
+      return { label, pressed: on ? 'true' : 'false', border: on ? '#f2c230' : c.ctl, color: on ? '#f2c230' : c.text, pick: () => this.setState({ size: id }) };
+    });
+    const canDel = idx > 0 && idx < last;
+    const MODALS = {
+      book: {
+        title: '导出打印稿', desc: '京都 · ' + sizeName + ' cm · ' + pages + ' 页 · 套用全部编辑参数',
+        groups: [
+          ['type', '输出类型', [['pdfx', '印厂 PDF（PDF/X-4）'], ['jpg', '逐页 JPEG'], ['tif', '逐页 TIFF']]],
+          ['marks', '裁切标记', [['on', '添加'], ['off', '不添加']]],
+          ['bleed', '出血', [['on', '包含 3 mm'], ['off', '不包含']]],
+          ['color', '色彩', [['rgb', 'RGB + 嵌入 ICC'], ['cmyk', '转为 CMYK']]],
+          ['preset', '印厂预设', [['a', '[印厂名称]'], ['custom', '自定义…']]]
+        ],
+        note: emptyTotal ? '输出前检查：全书还有 ' + emptyTotal + ' 个空照片框' : '输出前检查全部通过', ok: '导出'
+      }
+    };
+    return Object.assign({}, sh, this.modalVals(c, MODALS), {
+      thumbs, slots, caps, templates, guideOpts, checks, strip, gm, sizeOpts,
+      spreadRatio: gm.TW + ' / ' + gm.TH,
+      sizeLabel: '京都 · ' + sizeName + ' cm · ' + pages + ' 页 · 拖动缩略图调整页序',
+      modalNoteColor: emptyTotal ? '#e8a33c' : c.muted,
+      openBook: () => this.setState({ modal: 'book' }),
+      noDel: !canDel, delColor: canDel ? c.text : c.muted, delTip: canDel ? '删除当前跨页' : '封面和封底不能删除',
+      delSpread: () => {
+        const i = this.state.spread;
+        const L = this.state.spreads.length - 1;
+        if (i <= 0 || i >= L) return;
+        const sps = this.state.spreads.slice();
+        sps.splice(i, 1);
+        this.setState({ spreads: sps, spread: Math.min(i, sps.length - 2) });
+      },
+      srcName: '京都',
+      pageCount: pages,
+      spreadLabel: (idx === 0 || idx === last ? lab(idx) : '跨页 ' + lab(idx)) + ' · ' + (idx + 1) + ' / ' + s.spreads.length,
+      prevSpread: () => this.setState({ spread: Math.max(0, this.state.spread - 1) }),
+      nextSpread: () => this.setState({ spread: Math.min(this.state.spreads.length - 1, this.state.spread + 1) }),
+      addSpread: () => {
+        const sps = this.state.spreads.slice();
+        const n = sps.length - 1;
+        sps.splice(n, 0, { tpl: 'C', placed: {}, text: {} });
+        this.setState({ spreads: sps, spread: n });
+      },
+      showBleed: g.bleed, showTrim: g.trim, showSafe: g.safe, showGutter: g.gutter, cropPreview: g.crop,
+      stripTitle: s.showUsed ? '全部照片' : '待选照片',
+      stripEmpty: strip.length === 0, stripCount: strip.length,
+      usedPressed: s.showUsed ? 'true' : 'false', usedBox: s.showUsed ? '#f2c230' : 'transparent', usedBorder: s.showUsed ? '#f2c230' : c.muted,
+      toggleUsed: () => this.setState({ showUsed: !this.state.showUsed }),
+      pickedCount: Object.keys(s.picked).length,
+      selectAll: () => { const p = {}; order.forEach((k) => { p[k] = true; }); this.setState({ picked: p }); },
+      clearSel: () => this.setState({ picked: {} })
+    });
+  }
+}
+</script>
+</body>
+</html>
