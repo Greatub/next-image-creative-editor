@@ -11,7 +11,7 @@ Record the ID, question, why it matters, and current status / recommendation. Wh
 | ID | Question | Why it matters | Status / recommendation |
 |---|---|---|---|
 | Q-001 | Desktop stack: native Swift + C++/Windows, Qt, Electron/Tauri + native imaging core, etc. | Determines performance, color management, printing, and RAW integration | Undecided. The image pipeline needs GPU acceleration and 16-bit depth; evaluate a native imaging core with a cross-platform UI |
-| Q-004 | NEF decoding, including High Efficiency RAW, and licensing | The product depends on decoding support | Undecided. Investigate Nikon SDK access / license terms, or third-party library support for HE/HE* |
+| Q-004 | NEF decoding, including High Efficiency RAW, and licensing | The product depends on decoding support | Undecided. First data point (2026-10-23): LibRaw 0.22 decodes a NIKON Z 30 NEF (uncompressed-tag, 5600×3728, crop 5568×3712) correctly; half-size decode ≈0.3 s. High Efficiency RAW not yet tested (needs a sample from a supporting body). Still investigate Nikon SDK access / license terms |
 
 ## Nikon interoperability: validate before development
 
@@ -22,6 +22,7 @@ Record the ID, question, why it matters, and current status / recommendation. Wh
 | Q-005 | Where to store ratings / color labels, and how to interoperate with NX Studio? | Culling results must agree across both applications | Unverified |
 | Q-006 | Does NX Studio read hierarchical XMP/IPTC keywords written by NICE? | Determines the value of album-to-keyword writing | Unverified |
 | Q-007 | Is custom Picture Control NP3 export feasible? | Could bring NICE looks back to cameras | Unverified; not required for v1 |
+| Q-015 | Can NICE render L1 parameters so the result matches NX Studio (lens correction for vignetting / distortion, Picture Control tone curves, Active D-Lighting, white balance)? “NX Studio can read the parameters” and “NICE renders them the same way” are separate claims | The “Restorable in NX Studio” label implies visual consistency between the two apps | Unverified. First observation (2026-10-23, `Sample Photos/DSC_3183`): a plain LibRaw render with camera WB differs visibly from the camera JPEG — uncorrected 12 mm vignetting and distortion, deeper / more saturated sky, darker shadows. Next: compare against NX Studio exports of the same NEF with single-parameter edits |
 
 ## Product and content
 

@@ -16,3 +16,6 @@ Desktop.ini
 .idea/
 .vscode/
 *.log
+
+# Local sample photos (large, private; never commit)
+Sample Photos/

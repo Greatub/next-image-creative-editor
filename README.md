@@ -32,6 +32,7 @@ English is the primary language of repository documentation; Simplified Chinese 
 | [design/prototype/](design/prototype/README.md) | Local design snapshots and their limitations | Design |
 | [App Icon/](App%20Icon/) | Final SVG, ICNS, ICO, and PNG assets; do not modify | Brand |
 | [SVG Icon/](SVG%20Icon/) | Alternative icon designs; do not modify | Brand |
+| `Sample Photos/` | Local test photos (NEF / JPEG / NX Studio sidecars) for validation work; git-ignored, exists only in the owner's working copy | Owner |
 
 ## Repository and collaboration
 
