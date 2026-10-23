@@ -1,73 +1,79 @@
-# 架构要点
+# Architecture
 
-最后更新：2026-10-23 · 状态：概念设计，技术选型未定（见 `open-questions.md` Q-001）
+[English](architecture.md) | [简体中文](zh-CN/architecture.md)
 
-## 1. 原则
+Last updated: 2026-10-23. Status: concept design; technology stack undecided (Q-001 in [open questions](open-questions.md)).
 
-- 原始照片文件（NEF / NRW / JPEG / HEIF）**只读**。
-- 编辑结果以「参数」形式保存，渲染时实时计算；只有导出时才生成新的像素文件。
-- 每个参数都属于明确的一层（L1 / L2 / L3），并在界面上标注。
+## 1. Principles
 
-## 2. 参数分层
+- Original photo files (NEF / NRW / JPEG / HEIF) are **read-only**.
+- Save edits as parameters and evaluate them during rendering. Create new pixel files only on export.
+- Every parameter belongs to a declared layer (L1 / L2 / L3), identified in the interface.
 
-| 层级 | 含义 | 存放位置 | NX Studio / Capture NX-D 中 | 界面标注 |
+## 2. Parameter layers
+
+| Layer | Meaning | Storage | In NX Studio / Capture NX-D | Interface label |
 |---|---|---|---|---|
-| **L1 兼容层** | 尼康软件本来就支持的调整：白平衡、曝光补偿、优化校准（Picture Control）、以及能一一对应的色调/色彩参数 | `<照片目录>/NKSC_PARAM/<文件名>.nksc` | 效果一致 | 「NX Studio 可还原」 |
-| **L2 扩展层** | 只有 NICE 支持的效果和数据：风格滤镜、胶片档案、颗粒、负片转换、网格线偏好、相册、版面、证件照参数、照片状态等 | NICE 边车文件（建议 `<照片目录>/NICE_PARAM/<文件名>.nice`，JSON）+ NICE 资料库 | 看不到，或只看到近似 | 「仅 NICE」 |
-| **L3 烘焙层** | 导出时把 L1 + L2 全部效果写进新文件 | 导出目录中的新文件 | 完全一致（是普通图片） | — |
+| **L1 · Compatibility** | Adjustments supported by Nikon software: white balance, exposure compensation, Picture Control, and tone/color parameters with a direct mapping | `<photo-directory>/NKSC_PARAM/<filename>.nksc` | Intended to match; requires Q-002 validation | Restorable in NX Studio |
+| **L2 · Extensions** | NICE-only effects and data: style presets, film profiles, grain, negative conversion, grid preferences, albums, layouts, ID photo parameters, photo status, etc. | NICE sidecar (proposed: `<photo-directory>/NICE_PARAM/<filename>.nice`, JSON) + NICE database | Unavailable, or only approximated | NICE only |
+| **L3 · Baked output** | All L1 + L2 effects rendered into a new file during export | New file in the export directory | Matches the rendered output, as an ordinary image | — |
 
-规则：
-- 能用 L1 表达的就用 L1；L2 效果尽量提供「降级为 L1 的近似」（例如负片反转用各通道反向曲线近似），以便 NX Studio 至少看到大致正确的结果。**是否可行需验证（Q-003）**。
-- 验证前，**不往 `.nksc` 写入任何 NX Studio 不认识的数据**；L2 一律单独存放。
-- 读到外部修改过的 `.nksc`（例如用户在 NX Studio 里调过）时，以文件内容为准刷新 L1 参数，L2 参数保持不变。
+Rules:
 
-## 3. 照片元数据
+- Use L1 whenever it can express the adjustment. Where possible, provide an L1 approximation for L2 effects, such as reversed per-channel curves for negative inversion. **Feasibility requires validation (Q-003).**
+- Until validated, **never write data NX Studio does not recognize into `.nksc`**. Keep L2 separate.
+- When an external application changes `.nksc`, refresh L1 from that file and retain L2 unchanged.
 
-| 数据 | 存放 | 说明 |
+## 3. Photo metadata
+
+| Data | Storage | Notes |
 |---|---|---|
-| 评分、色标 | 待定（Q-005） | 尼康软件有自己的评分存放方式，需验证 NICE 写入后 NX Studio 是否可见 |
-| 排除标记 | L2 | — |
-| 相册归属 | 「写入照片关键字」开关打开时写入 XMP/IPTC 层级关键字（如 `旅行|日本|京都`）；关闭时只在 NICE 资料库 | 普通相册默认打开，临时相册与智能相册默认关闭 |
-| 相册结构、顺序、智能规则 | NICE 资料库（L2） | 同一照片在不同相册中可有不同顺序 |
-| 相册书版面 | 相册书项目数据（L2），嵌入模板副本 | 照片按路径引用；照片移动后提供重新链接 |
+| Ratings and color labels | Undecided (Q-005) | Validate that NX Studio reads ratings written by NICE |
+| Rejection flag | L2 | — |
+| Album membership | Hierarchical XMP/IPTC keywords, such as `Travel\|Japan\|Kyoto`, when Write photo keywords is enabled; otherwise only the NICE database | Enabled by default for normal albums; disabled for temporary and smart albums |
+| Album hierarchy, order, and smart rules | NICE database (L2) | A photo may have different positions in different albums |
+| Photo book layout | Book project data (L2), with embedded template copies | Photos are referenced by path; provide relinking after files move |
 
-## 4. 处理管线（顺序固定，与编辑页右栏编号一致）
+## 4. Processing pipeline
 
-1. **① 几何**：镜头校正（暗角、畸变、横向色差）→ 拉直 → 裁剪
-2. **负片转换**（仅当照片标记为底片翻拍）：片基校正 → 反转 → 逐通道色阶 → 密度 / 色彩平衡 → 除尘
-3. **② 曝光与白平衡**：白平衡（预设 / 吸管 / 色温色调）→ 曝光 → 优化校准
-4. **③ 色调**：对比度、高光、阴影、白色、黑色
-5. **④ 色彩**：鲜艳度、饱和度
-6. **⑤ 细节**：清晰度、锐化、降噪
-7. **风格 / 胶片档案**：按强度混合；颗粒
-8. **输出**：屏幕显示（显示器 ICC）/ 软打样（打印机 ICC）/ 导出（目标色彩空间 + 输出锐化）
+The order is fixed and matches the Edit panel numbering.
 
-设计稿中用 CSS 滤镜模拟这些效果，仅为演示，**不代表实现方式**。
+1. **① Geometry:** lens correction (vignetting, distortion, lateral chromatic aberration) → straighten → crop.
+2. **Negative conversion**, only for film scans: film-base correction → inversion → per-channel levels → density / color balance → dust removal.
+3. **② Exposure and white balance:** white balance (presets / eyedropper / temperature and tint) → exposure → Picture Control.
+4. **③ Tone:** contrast, highlights, shadows, whites, blacks.
+5. **④ Color:** vibrance and saturation.
+6. **⑤ Detail:** clarity, sharpening, noise reduction.
+7. **Style / film profile:** blend by strength; grain.
+8. **Output:** display (monitor ICC) / soft proofing (printer ICC) / export (target color space + output sharpening).
 
-## 5. 负片转换（胶卷翻拍）
+The design prototypes simulate these effects with CSS filters. This is for demonstration and **does not prescribe the implementation**.
 
-- 以「卷」为单位：同一卷共享片基取样与转换参数，可「同步到整卷」。
-- 支持：彩色负片（C-41）、黑白负片、彩色反转片（E-6，不反转，只套用档案）。
-- 步骤：标记为底片 → 片基取样（在片头或画格间取样，整卷共用）→ 反转 → 自动色阶（逐通道黑白点）→ 密度 / 青红 / 品绿 / 黄蓝 → 除尘（数码翻拍没有红外通道，只能靠算法，效果有限）→ 自动裁掉片边和齿孔。
-- 胶片档案（编辑页左栏「胶片」标签）同时用于：底片还原后的色彩风格、给数码照片加胶片感。
-- 全部属于 L2。
+## 5. Negative conversion (film digitization)
 
-## 6. 导入与导出
+- Organize film scans by roll. Share film-base samples and conversion parameters within a roll, with Sync to roll.
+- Support color negative (C-41), black-and-white negative, and color reversal film (E-6; apply a profile without inversion).
+- Sequence: mark as film scan → sample film base from the leader or gaps between frames, shared across the roll → invert → auto levels with per-channel black/white points → density / cyan–red / magenta–green / yellow–blue → dust removal → automatically crop film borders and sprocket holes.
+- Digital camera scans have no infrared channel. Dust removal relies on algorithms and has limited effectiveness.
+- Film profiles in Edit's left Film tab apply both to restored film colors and to film looks for digital photos.
+- All of this belongs to L2.
 
-- **导入**：从存储卡复制到目标目录（可按日期分文件夹、可重命名、可同时备份到第二块硬盘），可选只导入 NEF；导入后可加入相册；卡上原文件不改动。
-- **导出（L3）**：JPEG / TIFF 16 位 / HEIF；尺寸；sRGB / Adobe RGB；输出锐化（无 / 屏幕 / 打印）；元数据（全部 / 仅版权 / 去除位置）；文件名规则。
-- **导出打印稿**：印厂 PDF（PDF/X-4，含出血与可选裁切标记、嵌入 ICC 或转 CMYK）/ 逐页 JPEG / 逐页 TIFF；印厂预设保存出血、安全区、书脊等参数。
-- **打印**：经系统打印对话框；软打样使用打印机 + 纸张的 ICC 与所选渲染方式。
+## 6. Import and output
 
-## 7. 待验证的技术点（开发前置）
+- **Import:** copy from a memory card to a destination, optionally organizing by date, renaming, and backing up to a second drive. Allow NEF-only import and adding imported photos to an album. Never modify originals on the card.
+- **Export (L3):** JPEG / 16-bit TIFF / HEIF; dimensions; sRGB / Adobe RGB; sharpening (none / screen / print); metadata (all / copyright only / remove location); filename rules.
+- **Export print files:** print-ready PDF (PDF/X-4, bleed, optional crop marks, embedded ICC or CMYK conversion) / per-page JPEG / per-page TIFF. Print-provider presets store bleed, safe area, spine, and related parameters.
+- **Print:** use the system print dialog. Soft proof with the selected printer + paper ICC and rendering intent.
 
-| 编号 | 内容 |
+## 7. Technical validation required before development
+
+| ID | Validation |
 |---|---|
-| Q-002 | `.nksc` 格式能否由第三方可靠地读写，NX Studio 是否接受 |
-| Q-003 | `.nksc` 中加入未知数据是否会被 NX Studio 拒绝或清除；L2 降级为 L1 近似是否可行 |
-| Q-004 | NEF（含高效率 RAW）解码方案与授权：尼康 SDK 或其他解码库 |
-| Q-005 | 评分 / 色标的存放位置与 NX Studio 互通 |
-| Q-006 | NX Studio 是否读取 NICE 写入的 XMP/IPTC 层级关键字 |
-| Q-007 | 自定义优化校准（NP3）导出可行性（让 NICE 风格回到相机） |
+| Q-002 | Reliable third-party `.nksc` read/write and acceptance by NX Studio |
+| Q-003 | Whether unknown `.nksc` data is rejected or removed; feasibility of L2-to-L1 approximations |
+| Q-004 | NEF decoding, including High Efficiency RAW, and licensing: Nikon SDK or other libraries |
+| Q-005 | Rating / color-label storage and NX Studio interoperability |
+| Q-006 | NX Studio reading of hierarchical XMP/IPTC keywords written by NICE |
+| Q-007 | Custom Picture Control NP3 export to bring NICE looks back to the camera |
 
-详细描述与状态见 `open-questions.md`。
+See [open questions](open-questions.md) for details and status.

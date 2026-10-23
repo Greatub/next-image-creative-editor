@@ -1,32 +1,38 @@
-# 决策记录
+# Decision log
 
-最高优先级的真相来源。推翻任何一条，需要项目负责人确认并新增一条记录说明替代关系。
-状态：**已定** = 项目负责人确认；**提议** = 等待确认；**已废弃** = 被后续决策替代。
+[English](decisions.md) | [简体中文](zh-CN/decisions.md)
 
-| 编号 | 日期 | 决策 | 状态 |
+Last updated: 2026-10-23.
+
+This is the highest-priority source of truth. Replacing a decision requires the project owner's confirmation and a new record explaining the replacement.
+
+Status: **Confirmed** = approved by the project owner; **Proposed** = awaiting confirmation; **Superseded** = replaced by a later decision.
+
+| ID | Date | Decision | Status |
 |---|---|---|---|
-| D-001 | 2026-10-23 | 软件名 **NICE**，全称 Next Image Creative Editor | 已定 |
-| D-002 | 2026-10-23 | 编辑参数独立于原文件保存；原始文件只读 | 已定 |
-| D-003 | 2026-10-23 | 参数分层：L1（`.nksc`，NX Studio / Capture NX-D 可读）、L2（仅 NICE）、L3（导出烘焙） | 已定 |
-| D-004 | 2026-10-23 | 目标用户为尼康用户，深度支持尼康格式与功能 | 已定 |
-| D-005 | 2026-10-23 | 主题：深色与中性灰两套 | 已定 |
-| D-006 | 2026-10-23 | 左右栏宽度固定且相等（300px）；四页骨架统一，避免切换功能时视觉抖动 | 已定 |
-| D-007 | 2026-10-23 | 显示方式三种：标准（全部固定）/ 专注（仅底栏固定）/ 沉浸（全部自动隐藏），可与窗口 / 全屏任意组合；**不设单栏图钉** | 已定 |
-| D-008 | 2026-10-23 | 显示方式控件浮动在照片区角落，随鼠标移动显示、静止后隐藏 | 已定 |
-| D-009 | 2026-10-23 | 底栏用于照片浏览与选择，四页通用 | 已定 |
-| D-010 | 2026-10-23 | 同一张照片的 NEF 与 JPEG 可选择叠加显示为一张 | 已定 |
-| D-011 | 2026-10-23 | 编辑页照片网格线可选 | 已定 |
-| D-012 | 2026-10-23 | 编辑页引入工作流：右栏调整按 ①几何 ②曝光与白平衡 ③色调 ④色彩 ⑤细节 编号，与处理顺序一致 | 已定 |
-| D-013 | 2026-10-23 | 证件照覆盖国际常用规格 | 已定 |
-| D-014 | 2026-10-23 | 相册书只做标准文件输出（PDF / 逐页图片），不对接在线服务商；提供出血线参考 | 已定 |
-| D-015 | 2026-10-23 | 相册书提供内置模板与自定义模板 | 已定 |
-| D-016 | 2026-10-23 | 「相册」与「标签」合并为统一概念「相册」：照片可属于多个相册，支持嵌套、智能相册、临时相册，每个相册可选择是否写入照片关键字 | 已定 |
-| D-017 | 2026-10-23 | 相册书功能并入「相册」页：左栏为相册预览（页面缩略图），底栏为所选相册中的待选照片 | 已定 |
-| D-018 | 2026-10-23 | 相册管理放在浏览页左栏；**来源只在浏览页选择**（方案 B，避免底栏选择后左栏焦点不同步造成混淆） | 已定 |
-| D-019 | 2026-10-23 | 底栏来源仅作显示占位，不可选择，以保证视觉防抖 | 已定 |
-| D-020 | 2026-10-23 | 本版取消幻灯片功能；以后如恢复，作为相册页的「放映」视图，不新增导航页 | 已定 |
-| D-021 | 2026-10-23 | 去冗余：一个功能只有一个位置（见 `ui-spec.md` §8）；主题收进设置 ⚙；「存为 PDF」作为打印机选项；已选数量只在底栏右段显示 | 已定 |
-| D-022 | 2026-10-23 | P0 范围确认：导入、可修改评分/色标/排除、排序、缩放、白平衡预设/吸管/优化校准、溢出警告、软打样、证件照人像调整、相册书尺寸/图注编辑/删页、导出对话框 | 已定 |
-| D-023 | 2026-10-23 | 胶卷翻拍放在编辑页：左栏「胶片」标签提供胶片档案，右栏「负片转换」标签提供参数设置 | 已定 |
-| D-024 | 2026-10-23 | 导航顺序：浏览 → 编辑 → 相册 → 打印 | 已定 |
-| D-025 | 2026-10-23 | 文档用简体中文，代码与标识符用英文；项目规范以本文件夹为准 | 已定 |
+| D-001 | 2026-10-23 | Product name: **NICE**, short for Next Image Creative Editor | Confirmed |
+| D-002 | 2026-10-23 | Store editing parameters separately; original files are read-only | Confirmed |
+| D-003 | 2026-10-23 | Parameter layers: L1 (`.nksc`, readable by NX Studio / Capture NX-D), L2 (NICE only), L3 (baked export) | Confirmed |
+| D-004 | 2026-10-23 | Target Nikon users with deep support for Nikon formats and features | Confirmed |
+| D-005 | 2026-10-23 | Provide Dark and Neutral Gray themes | Confirmed |
+| D-006 | 2026-10-23 | Equal, fixed 300px side panels; all four pages share a stable shell without layout shifts | Confirmed |
+| D-007 | 2026-10-23 | Three view modes: Standard (all fixed), Focus (only footer fixed), Immersive (all auto-hide), independent of window / fullscreen; no per-panel pins | Confirmed |
+| D-008 | 2026-10-23 | Floating view-mode controls in a photo-stage corner appear with mouse movement and hide when idle | Confirmed |
+| D-009 | 2026-10-23 | Use the shared footer for photo browsing and selection on all four pages | Confirmed |
+| D-010 | 2026-10-23 | Optionally stack matching NEF and JPEG files as one photo item | Confirmed |
+| D-011 | 2026-10-23 | Optional photo grids on Edit | Confirmed |
+| D-012 | 2026-10-23 | Number Edit adjustments by workflow: ① Geometry ② Exposure and white balance ③ Tone ④ Color ⑤ Detail, matching processing order | Confirmed |
+| D-013 | 2026-10-23 | Cover commonly used international ID photo specifications | Confirmed |
+| D-014 | 2026-10-23 | Photo books export standard files (PDF / page images), without online-provider integration; show bleed guides | Confirmed |
+| D-015 | 2026-10-23 | Provide built-in and custom photo book templates | Confirmed |
+| D-016 | 2026-10-23 | Unify albums and tags as Albums: multiple membership, nesting, smart and temporary albums, and per-album choice of writing photo keywords | Confirmed |
+| D-017 | 2026-10-23 | Put photo books on Album: page thumbnails on the left, available photos from the selected album in the footer | Confirmed |
+| D-018 | 2026-10-23 | Manage albums in Browse's left panel; choose sources only on Browse (option B, avoiding footer / sidebar focus mismatch) | Confirmed |
+| D-019 | 2026-10-23 | The footer source indicator is display-only to preserve layout stability | Confirmed |
+| D-020 | 2026-10-23 | Exclude slideshows from this version; if restored, use a Presentation view on Album without a new navigation page | Confirmed |
+| D-021 | 2026-10-23 | One location per feature (UI spec §8); theme in Settings; Save as PDF as a printer option; selection count only in the footer's right section | Confirmed |
+| D-022 | 2026-10-23 | P0 includes import, editable ratings / color labels / rejection, sorting, zoom, white-balance presets / eyedropper / Picture Control, clipping warnings, soft proofing, ID portrait adjustment, book size / caption editing / page deletion, and export dialog | Confirmed |
+| D-023 | 2026-10-23 | Film digitization belongs on Edit: Film profiles in the left Film tab; conversion settings in the right Negative conversion tab | Confirmed |
+| D-024 | 2026-10-23 | Navigation order: Browse → Edit → Album → Print | Confirmed |
+| D-025 | 2026-10-23 | Use Simplified Chinese for documents and English for code / identifiers; this project folder defines the specifications | Superseded → D-026 |
+| D-026 | 2026-10-23 | Per the project owner's request, repository material is English first and Simplified Chinese second. Default documents use English; complete Chinese translations live in `docs/zh-CN/`, with reciprocal links. English is the maintenance baseline; keep translations synchronized. Retain existing Chinese design prototypes as references. This does not decide product interface language or change behavior. Replaces D-025's documentation language rule; other collaboration principles remain in force. | Confirmed |

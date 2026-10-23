@@ -1,33 +1,37 @@
-# 术语表
+# Glossary
 
-| 中文（界面用语） | 英文 / 代码标识符 | 说明 |
-|---|---|---|
-| 浏览 / 编辑 / 相册 / 打印 | `browse` / `edit` / `album` / `print` | 四个页面 |
-| 来源 | `source` | 底栏照片的来源：文件夹或相册；只在浏览页选择 |
-| 照片条 | `filmstrip` | 底栏中的缩略图条 |
-| 展开 | `expandGrid` | 照片条展开为网格 |
-| 显示方式 | `viewMode` | 标准 `std` / 专注 `focus` / 沉浸 `immersive` |
-| 主题 | `theme` | 深色 `dark` / 中性灰 `gray` |
-| 照片区 | `stage` | 中间显示照片或版面的区域 |
-| 相册 | `album` | 照片的归类；可嵌套；照片可属于多个相册。**不再使用「影集」「标签」** |
-| 智能相册 | `smartAlbum` | 按规则自动收集 |
-| 临时相册 | `tempAlbum` | 临时归类（例：待整理） |
-| 写入照片关键字 | `writeKeywords` | 把相册归属写成 XMP/IPTC 层级关键字 |
-| 相册预览 | `bookPages` | 相册页左栏的页面缩略图 |
-| 跨页 | `spread` | 左右两页 |
-| 待选照片 | `candidates` | 相册中尚未放入版面的照片 |
-| 出血线 / 裁切线 / 安全线 / 装订中缝 | `bleed` / `trim` / `safe` / `gutter` | 版面参考线 |
-| 导出打印稿 | `exportBook` | 相册书输出 |
-| 参数文件 | `sidecar` | `.nksc`（L1）与 `.nice`（L2） |
-| L1 / L2 / L3 | `layer1` / `layer2` / `layer3` | 参数分层 |
-| 风格 | `stylePreset` | 数码照片的风格滤镜 |
-| 胶片档案 | `filmProfile` | 底片还原 / 胶片感 |
-| 负片转换 | `negativeConversion` | 胶卷翻拍的反转与校正 |
-| 胶卷 | `roll` | 同一卷底片，共享片基取样 |
-| 片基 | `filmBase` | 负片的橙色片基 |
-| 优化校准 | `pictureControl` | 尼康 Picture Control |
-| 溢出警告 | `clippingWarning` | 直方图两端的暗部 / 高光提示 |
-| 软打样 | `softProof` | 按打印机 ICC 模拟打印效果 |
-| 证件照 | `idPhoto` | 打印页的布局之一 |
-| 排除 | `reject` | 选片时的淘汰标记 |
-| 色标 | `colorLabel` | 红 / 黄 / 绿 / 蓝 / 紫 |
+[English](glossary.md) | [简体中文](zh-CN/glossary.md)
+
+Last updated: 2026-10-23. Use these terms consistently in both languages.
+
+| English | Simplified Chinese | Code identifier | Meaning |
+|---|---|---|---|
+| Browse / Edit / Album / Print | 浏览 / 编辑 / 相册 / 打印 | `browse` / `edit` / `album` / `print` | Four workflow pages |
+| Source | 来源 | `source` | Folder or album supplying the filmstrip; chosen only on Browse |
+| Filmstrip | 照片条 | `filmstrip` | Footer thumbnails |
+| Expand | 展开 | `expandGrid` | Expand the filmstrip into a grid |
+| View mode | 显示方式 | `viewMode` | Standard (`std`) / Focus (`focus`) / Immersive (`immersive`); 标准 / 专注 / 沉浸 |
+| Theme | 主题 | `theme` | Dark (`dark`) / Neutral Gray (`gray`); 深色 / 中性灰 |
+| Photo stage | 照片区 | `stage` | Central photo or layout preview |
+| Album | 相册 | `album` | Photo grouping; supports nesting and multiple membership. In Chinese, do not use 影集 / 标签 for this concept |
+| Smart album | 智能相册 | `smartAlbum` | Rule-based automatic grouping |
+| Temporary album | 临时相册 | `tempAlbum` | Temporary grouping, such as To organize |
+| Write photo keywords | 写入照片关键字 | `writeKeywords` | Store membership as hierarchical XMP/IPTC keywords |
+| Page thumbnails | 相册预览 | `bookPages` | Book page thumbnails in Album's left panel |
+| Spread | 跨页 | `spread` | Facing left and right pages |
+| Available photos | 待选照片 | `candidates` | Album photos not yet placed in a layout |
+| Bleed / trim / safe area / gutter | 出血线 / 裁切线 / 安全线 / 装订中缝 | `bleed` / `trim` / `safe` / `gutter` | Layout guides |
+| Export print files | 导出打印稿 | `exportBook` | Photo book output |
+| Parameter file / sidecar | 参数文件 | `sidecar` | `.nksc` (L1) and `.nice` (L2) |
+| L1 / L2 / L3 | L1 / L2 / L3 | `layer1` / `layer2` / `layer3` | Parameter layers |
+| Style preset | 风格 | `stylePreset` | Style filters for digital photos |
+| Film profile | 胶片档案 | `filmProfile` | Film restoration / film looks |
+| Negative conversion | 负片转换 | `negativeConversion` | Film-scan inversion and correction |
+| Roll | 胶卷 | `roll` | Shared sampling and conversion parameters for one roll |
+| Film base | 片基 | `filmBase` | Negative film's orange base |
+| Picture Control | 优化校准 | `pictureControl` | Nikon Picture Control |
+| Clipping warning | 溢出警告 | `clippingWarning` | Shadow / highlight clipping |
+| Soft proofing | 软打样 | `softProof` | Simulate print appearance with a printer ICC profile |
+| ID photo | 证件照 | `idPhoto` | A Print layout |
+| Reject | 排除 | `reject` | Culling flag |
+| Color label | 色标 | `colorLabel` | Red / yellow / green / blue / purple |

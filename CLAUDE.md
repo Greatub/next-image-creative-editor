@@ -1,3 +1,7 @@
 # CLAUDE.md
 
-本项目的协作规则见 `AGENTS.md`，项目总览见 `README.md`。开始任何任务前请先完整阅读这两个文件，并遵守其中的真相来源优先级与产品约束。
+[English](CLAUDE.md) | [简体中文](docs/zh-CN/CLAUDE.md)
+
+Last updated: 2026-10-23.
+
+Read [AGENTS.md](AGENTS.md) and [README.md](README.md) in full before starting any task. Follow the shared source-of-truth priority, product constraints, and change process. Repository documentation is English first, with complete Simplified Chinese translations in `docs/zh-CN/` (D-026).

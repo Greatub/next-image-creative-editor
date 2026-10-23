@@ -1,0 +1,32 @@
+# 设计稿（可交互原型）
+
+[English](../../design/prototype/README.md) | [简体中文](prototype.md)
+
+最后更新：2026-10-23 · 状态：待定稿
+
+现有原型界面为简体中文，按 D-026 保留为设计参考。英文规范及双语术语表说明界面意图；此次资料更新不决定产品本地化策略。
+
+## 在线版本
+
+- 画布：<https://claude.ai/artifact/KBSdQUMurHk8Eoqh34f8Gj>（「NICE 界面构想」，四张设计稿）
+- 该链接默认为私有，需要项目负责人通过分享菜单开放后，其他人才能打开。GitHub 仓库公开不会改变画布访问权限。
+
+## 本地副本
+
+| 文件 | 页面 |
+|---|---|
+| `../../design/prototype/Main.dc.html` | 01 浏览 · 来源 / 相册管理 / 照片信息 |
+| `../../design/prototype/Edit.dc.html` | 02 编辑 · 风格与胶片 / ①–⑤ 调整 / 负片转换 |
+| `../../design/prototype/Album.dc.html` | 03 相册 · 相册预览 / 版面 / 待选照片 |
+| `../../design/prototype/Print.dc.html` | 04 打印 · 版式（含证件照）/ 输出 |
+| `../../design/prototype/canvas.json` | 画布布局索引 |
+
+这些 `.dc.html` 文件依赖设计画布的运行时，**直接用浏览器打开无法运行**；本地副本用于阅读结构、文案、交互状态和令牌用法。
+
+## 阅读注意
+
+- 设计稿是演示原型：照片用简单风景图形代替，调色用 CSS 滤镜模拟，数据为写死的示例。**不代表实现方式**，实现以 `../../docs/` 中的规范为准。
+- 每张设计稿各自保存状态，跨页不同步（例如在浏览页加入相册不会反映到其他页）。
+- `[打印机名称]`、`[印厂名称]`、`[第二块硬盘]` 等方括号内容是占位符。
+- 证件照参考线位置是示意值，正式数据见 [data-model.md](../../docs/data-model.md) 与 Q-008。
+- 设计稿与 `../../docs/` 不一致时，以 [decisions.md](../../docs/decisions.md) 和规范文档为准，并在 [open-questions.md](../../docs/open-questions.md) 记录差异。

@@ -1,142 +1,149 @@
-# 界面规范（UI Spec）
+# UI specification
 
-最后更新：2026-10-23 · 状态：待定稿 · 令牌见 `design/tokens.json`
+[English](ui-spec.md) | [简体中文](zh-CN/ui-spec.md)
 
-## 1. 设计原则
+Last updated: 2026-10-23. Status: pending finalization. Tokens: [design/tokens.json](../design/tokens.json).
 
-1. **一个功能只有一个位置**。全局功能在每页的同一位置；页面专属功能只出现在该页。
-2. **骨架相同、切换无抖动**。四个页面的标题栏、左右栏、底栏、照片区边距完全一致，切页时只有面板内容变化。
-3. **照片区保持干净**。照片上只有右下角的显示方式控件；临时提示（100% 缩放、吸管取样、软打样）可以短暂出现。
-4. **导航即工作流**：浏览 → 编辑 → 相册 → 打印。
+## 1. Design principles
 
-## 2. 统一骨架
+1. **One location per feature.** Global controls occupy the same location on every page; page-specific controls appear only on that page.
+2. **One stable shell.** Header, side panels, footer, and stage padding stay consistent. Switching pages changes panel content without moving the layout.
+3. **Keep the photo stage clean.** Only bottom-right view-mode controls and brief status messages (100% zoom, eyedropper sampling, soft proofing) appear over the photo.
+4. **Navigation follows the workflow:** Browse → Edit → Album → Print.
 
+## 2. Shared shell
+
+```text
++------------------------- Header: 48px -------------------------+
+| NICE | Browse Edit Album Print ... Undo Redo | Primary | Settings |
++-------------+------------------------------------+-------------+
+| Left panel  | Photo stage                        | Right panel |
+| 300px       | Padding: 32px                      | 300px       |
+|             |                  [View controls]   |             |
++-------------+------------------------------------+-------------+
+| Footer: 108px | Source: 236px | Filmstrip | Selection/Expand: 96px |
++----------------------------------------------------------------+
 ```
-┌──────────────────────── 标题栏 48px ────────────────────────┐
-│ NICE ｜ 浏览 编辑 相册 打印 ………… 撤销 重做 ｜ 主操作 ｜ ⚙     │
-├──────────┬──────────────────────────────────┬──────────┤
-│ 左栏      │ 照片区（stage）                    │ 右栏      │
-│ 300px    │ 边距 32px                          │ 300px    │
-│          │                    [显示方式控件] ↘ │          │
-├──────────┴──────────────────────────────────┴──────────┤
-│ 底栏 108px：[当前来源 236px] ｜ 照片条 ｜ [已选 n · 展开 96px] │
-└──────────────────────────────────────────────────────────┘
-```
 
-| 部件 | 尺寸 / 规则 | 令牌 |
+| Component | Dimensions / rules | Token |
 |---|---|---|
-| 标题栏 | 高 48px；左右内边距 16 / 12px | `layout.header` |
-| 左栏、右栏 | **固定 300px，宽度相等**，内容超出时面板内滚动 | `layout.sidePanel` |
-| 底栏 | 高 108px | `layout.footer` |
-| 照片区边距 | 32px；相册页与打印页底部为 72px（留出翻页条） | `layout.stagePad`、`layout.stagePadPaged` |
-| 主操作按钮 | 最小宽度 112px（文字变化时不挤动其他按钮） | `layout.primaryMinWidth` |
-| 显示方式控件 | 照片区右下角，距边 24px | `layout.floatInset` |
-| 边缘感应区 | 6px | `layout.hotZone` |
+| Header | 48px high; left / right padding 16 / 12px | `layout.header` |
+| Left and right panels | **Fixed, equal 300px width**; overflow scrolls within the panel | `layout.sidePanel` |
+| Footer | 108px high | `layout.footer` |
+| Stage padding | 32px; Album / Print bottom padding 72px for pagination | `layout.stagePad`, `layout.stagePadPaged` |
+| Primary action | Minimum width 112px; changing text must not push other controls | `layout.primaryMinWidth` |
+| View controls | Bottom-right stage corner, 24px inset | `layout.floatInset` |
+| Edge hot zone | 6px | `layout.hotZone` |
 
-**防抖动清单**（每次改界面都要自查）：
-- 不在照片区上方加工具栏。
-- 浏览页与编辑页的照片位置和大小必须一致（同为 32px 边距、同样的适合方式）。
-- 页面专属控件放进左右栏，不放在照片上。
-- 底栏三段宽度固定；打印页同样保持左段 236px。
-- 相册页和打印页的翻页条在同一位置（照片区底部居中，距底 24px）。
-- 主操作按钮宽度固定。
+**Layout-stability checklist**, required for interface changes:
 
-## 3. 显示方式
+- Do not add a toolbar above the photo stage.
+- Browse and Edit must match photo position and size: 32px padding and the same fit behavior.
+- Keep page-specific controls in side panels.
+- Keep the three footer sections stable; Print also uses a 236px source section.
+- Place Album and Print pagination identically: bottom center, 24px inset.
+- Keep primary-action width fixed.
 
-| 方式 | 标题栏 | 左栏 | 右栏 | 底栏 |
+## 3. View modes
+
+| Mode | Header | Left | Right | Footer |
 |---|---|---|---|---|
-| 标准 | 固定 | 固定 | 固定 | 固定 |
-| 专注 | 自动隐藏 | 自动隐藏 | 自动隐藏 | 固定 |
-| 沉浸 | 自动隐藏 | 自动隐藏 | 自动隐藏 | 自动隐藏 |
+| Standard | Fixed | Fixed | Fixed | Fixed |
+| Focus | Auto-hide | Auto-hide | Auto-hide | Fixed |
+| Immersive | Auto-hide | Auto-hide | Auto-hide | Auto-hide |
 
-- 与「窗口 / 全屏」相互独立，任意组合。
-- 不提供单栏图钉；只有这三种状态。
-- 自动隐藏的栏：鼠标移到对应边缘（6px 感应区）时以浮层形式滑出（160ms），移开后收回；收回不改变当前方式。
-- 显示方式控件：照片区右下角，含 标准 / 专注 / 沉浸 三个按钮（图标画出哪些栏可见）和窗口 / 全屏切换。鼠标移动时淡入（300ms），静止 2 秒淡出；鼠标停在控件上时不淡出；沉浸模式下鼠标指针同时隐藏。
-- 打开设置 ⚙ 时，即使处于自动隐藏状态，标题栏也保持显示。
-- 待实现（P1）：Tab 轮换方式、F 全屏、Esc 退出全屏回到标准；系统边缘冲突处理（macOS 全屏菜单栏、Windows 任务栏）：延迟约 0.3 秒呼出、感应区内移。
+- View mode is independent of window / fullscreen and supports every combination.
+- No per-panel pins; only these three modes.
+- Auto-hidden panels slide out as overlays in 160ms when the pointer reaches the matching 6px edge zone. Retract on leaving without changing the mode.
+- Bottom-right controls contain Standard / Focus / Immersive buttons, with icons showing visible panels, and window / fullscreen toggle. Fade in on movement (300ms), fade out after 2 seconds idle. Do not fade while hovered. Hide the pointer too in Immersive.
+- Keep the header visible while Settings is open, including in auto-hide modes.
+- P1: Tab cycles modes, F fullscreen, Esc exits fullscreen and returns to Standard. Resolve edge conflicts with the macOS fullscreen menu bar / Windows taskbar using about 0.3s reveal delay and inset hot zones.
 
-## 4. 标题栏
+## 4. Header
 
-`NICE Logo ｜ 导航（4 项）……（弹性空白）…… 撤销 · 重做 ｜ 主操作 ｜ ⚙`
+`NICE logo | Navigation (4 pages) ... flexible space ... Undo · Redo | Primary action | Settings`
 
-| 页面 | 主操作 |
+| Page | Primary action |
 |---|---|
-| 浏览 | 导出… |
-| 编辑 | 导出… |
-| 相册 | 导出打印稿 |
-| 打印 | 打印（选 PDF 打印机时为「存为 PDF」） |
+| Browse | Export… |
+| Edit | Export… |
+| Album | Export print files |
+| Print | Print, or Save as PDF when the PDF printer is selected |
 
-设置 ⚙：目前含界面主题（深色 / 中性灰）；P1 补充参数兼容层、显示器 ICC、默认目录、快捷键。
+Settings currently contains theme selection (Dark / Neutral Gray). P1 adds compatibility layer, monitor ICC, default directory, and shortcuts.
 
-## 5. 底栏（四页通用）
+## 5. Shared footer
 
-- **左段 236px**：当前来源（文件夹图标或相册图标 + 名称，**只读**，提示「来源在浏览页左栏选择」）；第二行为来源类型与排序 / 筛选摘要；第三行为位置「n / 总数」与多选提示。相册页第三行替换为「显示已用照片」开关。
-- **中段**：照片条。缩略图 100×66px，间距 8px；角标：文件类型、已编辑（黄点）、已选（勾）、排除（红色标签，照片变暗 40%）、相册页的「已用 页码」。
-- **右段 96px**：「已选 n」与「展开 / 收起」。展开后照片条在照片区内变为网格（标题行只显示来源与张数，以及 全选 / 清除选择）。
-- 选择：单击 = 当前照片；Ctrl/⌘ 单击 = 加减选；Shift 单击 = 连选。
-- 相册页的底栏只列当前相册中**尚未放入版面**的照片。
+- **Left, 236px:** current source icon + name, **read-only**, with the hint “Choose sources in Browse's left panel.” Second line: source type and sort / filter summary. Third line: “n / total” and multiselect hint; Album replaces this line with Show used photos.
+- **Center:** filmstrip, 100×66px thumbnails with 8px gaps. Badges: file type, edited (yellow dot), selected (check), rejected (red label, photo darkened 40%), and Album's Used / page number.
+- **Right, 96px:** “n selected” and Expand / Collapse. Expanded thumbnails become a grid inside the stage; its header shows only source, photo count, Select all, and Clear selection.
+- Click selects the current photo; Ctrl/⌘ click adds/removes selections; Shift click selects a range.
+- On Album, show photos in the current album **not yet placed in the layout** by default.
 
-## 6. 各页布局
+## 6. Page layouts
 
-### 6.1 浏览
-- **左栏（自上而下）**：存储卡卡片（「导入…」）· 搜索 · 文件夹 · 相册（+ 相册 / + 智能相册；相册树；每个可编辑相册行右侧有 ＋；行可接收拖放）· 归类提示 / 当前相册属性 · 筛选与排序（星级、只看已编辑、隐藏已排除；排序：拍摄时间 / 评分；显示：NEF+JPEG 叠加为一张）。
-- **照片区**：当前照片大图；双击 100%。
-- **右栏**：文件名与尺寸 · NEF / JPEG 切换（叠加时）· 评分（5 个星按钮）· 色标（无 / 红 / 黄 / 绿 / 蓝 / 紫）· 排除 · 快捷键提示 · 编辑状态一行 · 所属相册（只读标签）· 拍摄信息。
+### 6.1 Browse
 
-### 6.2 编辑
-- **左栏**：标签「风格 | 胶片」；滤镜网格（3 列）；强度（胶片标签下为「颗粒」）；参数卡片（状态、`NKSC_PARAM/…nksc` 路径、已修改项、存为预设、复制到所选 n）。
-- **照片区**：编辑预览；双击 100%；吸管模式下光标为十字、顶部临时提示；溢出警告叠加；前后对比时左上角显示「原图」。
-- **右栏**：顶部固定（直方图 + 暗部 ◣ / 高光 ◢ 溢出按钮 + 前 / 后；标签「调整 | 负片转换」），下方滚动：
-  - 调整：① 几何 → ② 曝光与白平衡（标注「NX Studio 可还原」）→ ③ 色调 → ④ 色彩 → ⑤ 细节；每区有「复位」，滑块双击复位。
-  - 负片转换（标注「仅 NICE · NX Studio 看不到」）：见 `product.md` ED-07。
-- 处理顺序与界面顺序一致（见 `architecture.md` §4）。
+- **Left, top to bottom:** memory-card card (Import…) · search · folders · albums (+ Album / + Smart album, tree, ＋ on each editable row, drag targets) · classification hint / current album properties · filters and sorting (stars, edited only, hide rejected, capture time / rating, Stack NEF+JPEG).
+- **Stage:** current photo; double-click for 100%.
+- **Right:** filename and dimensions · NEF / JPEG switch when stacked · five rating buttons · color label (none / red / yellow / green / blue / purple) · Reject · shortcut hints · single-line edit status · read-only album membership · capture metadata.
 
-### 6.3 相册
-- **左栏**：相册预览（2 列缩略图，比例随成品尺寸变化）；删除跨页 / + 跨页；尺寸与页数说明。
-- **照片区**：当前跨页（白纸 + 阴影）；照片框（空框为虚线框，点击放入当前照片，可拖入）；图注为可编辑文本；参考线叠加；底部居中翻页条。
-- **右栏**：模板（3 列示意）· 参考线开关（出血线红色虚线 / 裁切线黑色实线 / 安全线蓝色虚线 / 装订中缝灰色虚线 / 裁切后预览）· 版面设置（成品尺寸、出血 3mm、安全距离 5mm、装订、印厂预设）· 输出前检查（绿 = 通过，橙 = 需注意）。
+### 6.2 Edit
 
-### 6.4 打印
-- **左栏 版式**：纸张尺寸、方向、每页布局；非证件照时：适合方式、页边距、打印信息；证件照时：规格列表、人像位置（单张调整 / 整版预览、缩放、上下位置、自动对齐、状态）、背景、规格来源说明。
-- **照片区**：页面预览（软打样时纸色与颜色模拟）；证件照单张调整视图带头顶线（红）、下巴线（红）、眼睛区间（蓝带）、中轴线（灰虚线）；底部翻页条。
-- **右栏 输出**：打印机（含「存为 PDF」）、纸张类型、色彩管理（ICC、可感知 / 相对比色、软打样）、份数、汇总、「打印内容 = 底栏选中的照片」。
+- **Left:** Style / Film tabs; three-column preset grid; strength (Grain under Film); parameter card with save state, `NKSC_PARAM/…nksc` path, changed items, Save as preset, and Copy to selected n.
+- **Stage:** edit preview; double-click for 100%; eyedropper uses a crosshair and temporary top hint; clipping overlays; “Original” at top left during before/after comparison.
+- **Right:** fixed top section with histogram, shadow ◣ / highlight ◢ clipping buttons, before / after, and Adjustments / Negative conversion tabs; scrollable content below.
+- **Adjustments:** ① Geometry → ② Exposure and white balance (Restorable in NX Studio) → ③ Tone → ④ Color → ⑤ Detail. Each section has Reset; double-click sliders to reset individually.
+- **Negative conversion:** label “NICE only · Not visible in NX Studio”; see ED-07 in [product.md](product.md).
+- UI order matches processing order; see [architecture §4](architecture.md#4-processing-pipeline).
 
-## 7. 对话框
+### 6.3 Album
 
-- 统一样式：遮罩 55% 黑；面板 600px 宽、圆角 12px；每行「标签 112px + 分段选择」；底部「取消 / 主按钮」。
-- 导入（浏览）、导出（浏览、编辑）、导出打印稿（相册）。打印使用系统打印对话框。
+- **Left:** two-column page thumbnails, proportional to finished size; Delete spread / + Spread; size and page count.
+- **Stage:** current spread on white paper with shadow; dashed empty photo frames accepting click-to-place and drag; editable captions; guide overlays; bottom-center pagination.
+- **Right:** three-column template previews · guide toggles (red dashed bleed / black solid trim / blue dashed safe area / gray dashed gutter / trimmed preview) · layout settings (finished size, 3mm bleed, 5mm safe distance, binding, provider preset) · preflight (green = pass, orange = attention).
 
-## 8. 功能唯一位置表
+### 6.4 Print
 
-| 功能 | 唯一位置 |
+- **Left, Layout:** paper, orientation, per-page layout. For ordinary photos: fit mode, margins, printed information. For ID photos: specifications, portrait position (individual / full-sheet preview, zoom, vertical position, auto-align, status), background, and specification source notes.
+- **Stage:** page preview, with paper/color simulation during soft proofing. Individual ID adjustment shows top-of-head and chin guides in red, eye band in blue, and dashed gray centerline. Pagination at the bottom.
+- **Right, Output:** printer including Save as PDF, paper type, color management (ICC, perceptual / relative colorimetric, soft proof), copies, summary, and “Print content = filmstrip selection.”
+
+## 7. Dialogs
+
+- Shared style: 55% black overlay; 600px-wide panel with 12px radius; rows use a 112px label and segmented choice; Cancel / primary action at the bottom.
+- Import on Browse; Export on Browse / Edit; Export print files on Album. Printing uses the system print dialog.
+
+## 8. Feature location table
+
+| Feature | Only location |
 |---|---|
-| 选择来源（文件夹 / 相册）、搜索、筛选、排序、NEF+JPEG 叠加 | 浏览页左栏 |
-| 相册的新建、层级、智能规则、关键字设置；照片加入 / 移出相册 | 浏览页左栏 |
-| 评分、色标、排除 | 浏览页右栏（+ 快捷键） |
-| 修图参数、风格、胶片档案、负片转换 | 编辑页左右栏 |
-| 页面顺序、增删页 | 相册页左栏 |
-| 往版面放照片 | 相册页：底栏待选照片 → 照片框 |
-| 打印版式 / 证件照 | 打印页左栏 |
-| 打印机、色彩管理、软打样 | 打印页右栏 |
-| 主题等偏好 | 设置 ⚙ |
-| 显示方式、全屏 | 照片区右下角浮动控件 |
-| 导出 / 导出打印稿 / 打印 | 标题栏主操作 |
+| Source selection, search, filters, sorting, NEF+JPEG stacking | Browse left panel |
+| Album creation, hierarchy, smart rules, keyword settings; add/remove photos | Browse left panel |
+| Ratings, color labels, rejection | Browse right panel, plus shortcuts |
+| Editing parameters, styles, film profiles, negative conversion | Edit side panels |
+| Page order, add/delete pages | Album left panel |
+| Place photos in layouts | Album: available filmstrip photos → photo frames |
+| Print layout / ID photos | Print left panel |
+| Printer, color management, soft proofing | Print right panel |
+| Theme and preferences | Settings |
+| View mode and fullscreen | Bottom-right floating stage controls |
+| Export / Export print files / Print | Header primary action |
 
-## 9. 交互与快捷键
+## 9. Interactions and shortcuts
 
-| 操作 | 方式 |
+| Action | Interaction |
 |---|---|
-| 缩放 | 双击照片：适合 ↔ 100%；滚轮缩放（P0 待实现） |
-| 评分 / 清除 / 排除 | 1–5 / 0 / X |
-| 多选 / 连选 | Ctrl/⌘ 单击 / Shift 单击 |
-| 复位单个参数 | 双击滑块 |
-| 显示方式 / 全屏 | Tab 轮换、F 全屏、Esc 退出（P1） |
+| Zoom | Double-click: Fit ↔ 100%; wheel zoom remains to be implemented for P0 |
+| Rate / clear rating / reject | 1–5 / 0 / X |
+| Multiselect / range selection | Ctrl/⌘ click / Shift click |
+| Reset one parameter | Double-click slider |
+| View mode / fullscreen | Tab cycles, F fullscreen, Esc exits (P1) |
 
-## 10. 无障碍
+## 10. Accessibility
 
-- 文字对比度 ≥ 4.5:1（两套主题都要满足）；小号灰字也不例外。
-- 所有可点击元素使用原生 `button` / `a` / `input`；仅图标按钮必须有可读名称。
-- 拖放操作必须有点击方式的等价操作（相册 ＋ 按钮、点击空照片框放入）。
-- 颜色区分同时有明度差异，不只靠色相（溢出警告用红 / 蓝）。
-- 触控点击区域 ≥ 28px（桌面密集面板），主要按钮 ≥ 32px。
+- Text contrast ≥4.5:1 in both themes, including small muted text.
+- Clickable elements use native `button` / `a` / `input`; icon-only controls need readable names.
+- Every drag-and-drop action has a click equivalent, such as album ＋ and click-to-place in empty frames.
+- Distinguish states by luminance as well as hue; clipping overlays use red / blue.
+- Touch targets ≥28px in dense desktop panels; primary controls ≥32px.

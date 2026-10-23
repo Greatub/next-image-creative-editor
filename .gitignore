@@ -1,9 +1,9 @@
-# 系统文件
+# System files
 .DS_Store
 Thumbs.db
 Desktop.ini
 
-# 本地环境与凭据
+# Local environment and credentials
 .env
 .env.*
 !.env.example
@@ -12,7 +12,7 @@ Desktop.ini
 *.p12
 *.pfx
 
-# 本地工具与日志
+# Local tools and logs
 .idea/
 .vscode/
 *.log
