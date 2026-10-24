@@ -2,7 +2,7 @@
 
 [English](open-questions.md) | [简体中文](zh-CN/open-questions.md)
 
-Last updated: 2026-10-23.
+Last updated: 2026-10-24.
 
 Record the ID, question, why it matters, and current status / recommendation. When resolved, record the conclusion in [decisions.md](decisions.md) and mark this entry “Resolved → D-xxx”.
 
@@ -32,7 +32,7 @@ Record the ID, question, why it matters, and current status / recommendation. Wh
 | Q-008 | Sources and maintenance for ID photo specifications: official requirements, check dates, update process | Wrong specifications can cause rejection | Build a specification table with source links and verification dates; do not claim guaranteed compliance |
 | Q-009 | Should film profiles use real film stock names? | Trademark considerations | Prototypes use descriptive names such as Portrait Negative 160; real stock names require legal confirmation |
 | Q-010 | Font embedding licenses for photo book PDFs | Output licensing | Use freely embeddable open-source fonts such as Source Han Sans / Serif in built-in templates; check custom-template embedding rights before output |
-| Q-011 | Should the yellow accent `#F2C230` align with icon colors `#1E2732`, `#7E858C`, and `#FAF9F6`? | Brand consistency | Pending brand confirmation. Keep yellow for now; icon colors are in the `brand` token group |
+| Q-011 | Should the yellow accent `#F2C230` align with icon colors `#1E2732`, `#6B7280`, and `#FAF9F6`? | Brand consistency | Pending brand confirmation. Keep yellow for now; icon colors are in the `brand` token group |
 | Q-012 | Should photo status (Unprocessed / Editing / Complete) and editing workflow templates enter v1? | Scope | Discussed but not confirmed; pending |
 | Q-013 | What exactly does the Settings compatibility-layer switch mean, such as L1-only writing or disabling L2 effects? | A safe mode for NX Studio-only users | Design pending |
 | Q-014 | How does simultaneous multi-photo editing relate to Copy to selected? | Avoid duplicate entry points | Design pending; prefer retaining only Copy to selected |

@@ -2,7 +2,7 @@
 
 [English](decisions.md) | [简体中文](zh-CN/decisions.md)
 
-Last updated: 2026-10-23.
+Last updated: 2026-10-24.
 
 This is the highest-priority source of truth. Replacing a decision requires the project owner's confirmation and a new record explaining the replacement.
 
@@ -36,3 +36,4 @@ Status: **Confirmed** = approved by the project owner; **Proposed** = awaiting c
 | D-024 | 2026-10-23 | Navigation order: Browse → Edit → Album → Print | Confirmed |
 | D-025 | 2026-10-23 | Use Simplified Chinese for documents and English for code / identifiers; this project folder defines the specifications | Superseded → D-026 |
 | D-026 | 2026-10-23 | Per the project owner's request, repository material is English first and Simplified Chinese second. Default documents use English; complete Chinese translations live in `docs/zh-CN/`, with reciprocal links. English is the maintenance baseline; keep translations synchronized. Retain existing Chinese design prototypes as references. This does not decide product interface language or change behavior. Replaces D-025's documentation language rule; other collaboration principles remain in force. | Confirmed |
+| D-027 | 2026-10-24 | Per the project owner's request, the app icon is **v1.8.1** (`SVG Icon/nice_v1_8_1.svg`), refined from v1.8.0: matching clearance between the C and both bottom body lines, a wider C-to-E gap, and a wider E-to-body gap. `App Icon/` was re-exported from it (SVG, ICNS with the macOS 824/1024 grid, ICO, PNG 16–1024). Brand gray changes from `#7E858C` to `#6B7280` to match the icon; ink `#1E2732` and paper `#FAF9F6` are unchanged. Replaces the previous v1.7.1D-based icon set. | Confirmed |
