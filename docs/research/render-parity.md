@@ -2,7 +2,7 @@
 
 [English](render-parity.md) | [简体中文](../zh-CN/research/render-parity.md)
 
-Last updated: 2026-10-23. Status: **research notes**, not a specification. Covers Q-016; feeds Q-001, Q-004 and the "Restorable in NX Studio" wording.
+Last updated: 2026-10-24. Status: **research notes**, not a specification. Covers Q-016; feeds Q-001, Q-004 and the "Restorable in NX Studio" wording.
 
 ## 1. Question
 
@@ -83,11 +83,30 @@ All model figures except the LUT holdout row are **in-sample**: they were fitted
   NX Studio compresses highlights, so matching its exposure behavior needs its curve model, not just a gain.
 - **The NEF carries a Nikon render.** Its embedded preview is a full-size 5568×3712 JPEG (≈2.1 MB) within ΔE 0.66 (low-frequency) of the NX Studio export.
 
+### 3.3 Follow-up (2026-10-24): Active D-Lighting and Picture Control profiles
+
+The owner exported sample **f** (Active D-Lighting set to Off) and samples **g / h / i** (Picture Control Standard / Neutral / Flat). Sample **c** (Vivid) is from the first round. Lens corrections cannot be turned off in NX Studio for this lens, so test 2 in §7 is not possible.
+
+- **Active D-Lighting is not part of the gap on this sample.** The maker notes show the camera shot with Active D-Lighting **Off**, so "same as shot" already meant Off. Sample f is practically identical to e (ΔE 0.20 / 0.53 low-frequency). The fitted tone curves match to three decimals. The bright default tone is therefore the Picture Control curve plus Nikon's baseline exposure.
+- **Each profile has its own tone and color.** Results are low-frequency ΔE (mean / p95). Fitted curve values are linear luminance out for inputs 0.03 / 0.18 / 0.50:
+
+  | Profile | vs Auto | Fitted curve | Mean chroma C* | Auto's model applied | Model refitted for this profile |
+  |---|---|---|---|---|---|
+  | Auto (e) | — | 0.036 / 0.482 / 0.822 | 13.7 | 1.80 / 4.79 | 1.80 / 4.79 |
+  | Standard (g) | 0.74 / 1.91 | 0.036 / 0.485 / 0.831 | 12.1 | 1.97 / 4.79 | 1.68 / 4.37 |
+  | Vivid (c) | 1.80 / 3.60 | 0.024 / 0.458 / 0.807 | 14.7 | 2.68 / 5.94 | 1.95 / 5.07 |
+  | Neutral (h) | 2.52 / 4.44 | 0.051 / 0.404 / 0.763 | 11.3 | 2.96 / 5.66 | 1.55 / 3.96 |
+  | Flat (i) | 4.62 / 6.41 | 0.062 / 0.376 / 0.720 | 10.5 | 4.93 / 7.09 | 1.67 / 4.13 |
+
+  - On this scene, Auto behaves almost like Standard.
+  - Vivid deepens shadows and adds saturation. Neutral and Flat lift shadows, lower midtones and reduce saturation.
+- **One global model per profile fits every profile about equally well (≈ 1.6–2.0 mean).** Reusing Auto's model for another profile does not (up to 4.9 for Flat). Option B therefore needs **calibration data per camera × per Picture Control**, not one shared "Nikon look".
+
 ## 4. Conclusions for Q-016
 
 1. **Pixel-identical parity with NX Studio is not achievable** with LibRaw plus a hand-built pipeline. Nikon's own two engines (camera and NX Studio) differ by only ΔE ≈ 0.5–0.6 low-frequency. The best global model here reaches ≈1.5–1.8 in-sample, and worse out of sample.
 2. **"Close by eye" is plausible** if NICE models, in order of impact:
-   1. the default tone (Picture Control curve + baseline exposure + Active D-Lighting)
+   1. the default tone: Picture Control curve + baseline exposure, per profile (§3.3). Active D-Lighting also matters when the camera had it on; it was off for this sample
    2. lens distortion
    3. vignetting
    4. per-profile color
@@ -120,13 +139,14 @@ Lens correction data: the fitted coefficients above are from one image only. An 
 
 - One scene, one lens, one camera, one Picture Control (Auto). Models were fitted on the image they were tested on, except the LUT holdout.
 - 8-bit sRGB JPEGs as ground truth; half-resolution comparison.
-- The effects of Picture Control curve, baseline exposure and Active D-Lighting were not separated.
+- Picture Control curve and baseline exposure were not separated. Active D-Lighting was off in camera, so its effect when on is unmeasured.
 
 ## 7. Next tests (owner, NX Studio)
 
-Each export is from the same NEF, as JPEG, with one change:
-
-1. Active D-Lighting **Off**: separates ADL from the Picture Control curve.
-2. Lens corrections (distortion, vignette) **Off**: confirms the geometry and vignette models.
-3. Picture Control **Standard**, **Neutral** and **Flat**: per-profile tone and color, and Q-017.
-4. A second, different scene, ideally with a color checker or a colorful subject: out-of-sample check.
+| # | Test | Status |
+|---|---|---|
+| 1 | Active D-Lighting Off | Done (sample f): no effect, because the camera already had it off |
+| 2 | Lens corrections Off | Not possible: NX Studio does not allow it for this lens. Geometry and vignetting must be checked another way, e.g. against data read from the NEF maker notes |
+| 3 | Picture Control Standard / Neutral / Flat | Done (samples g / h / i) |
+| 4 | A second, different scene, ideally with a color checker or a colorful subject | Open: out-of-sample check |
+| 5 | A NEF shot with Active D-Lighting **on** in camera, exported once as shot and once with ADL Off | New: measures ADL itself |

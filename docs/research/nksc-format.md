@@ -2,7 +2,7 @@
 
 [English](nksc-format.md) | [简体中文](../zh-CN/research/nksc-format.md)
 
-Last updated: 2026-10-23. Status: **research notes**, not a specification. Covers Q-002, Q-003, Q-005; feeds Q-016 and Q-017.
+Last updated: 2026-10-24. Status: **research notes**, not a specification. Covers Q-002, Q-003, Q-005; feeds Q-016 and Q-017.
 
 ## 1. Samples and method
 
@@ -59,6 +59,52 @@ Active by default on this unedited NEF (17): `nikon::PictureControl`, `nikon::Qu
 | Rating | Embedded XMP in `ast:XMLPackets`: `xmp:Rating` (3) and `MicrosoftPhoto:Rating` (50 for 3 stars) | Base64 → XMP text | `nine:Rating` stays 0. Write both values; keep the packet padding so the packet length is stable |
 | Color label | `nine:Label` presumably | Text | Not yet tested |
 
+### 4.1 Follow-up (2026-10-24): Picture Control profiles and Active D-Lighting
+
+Samples f–i, each with one change in NX Studio:
+
+| Sample | Change |
+|---|---|
+| f | Active D-Lighting → Off |
+| g | Picture Control → Standard |
+| h | Picture Control → Neutral |
+| i | Picture Control → Flat |
+
+**`PictureControl` index:**
+
+| Index | Profile |
+|---|---|
+| 0 | Auto |
+| 2 | Standard |
+| 3 | Neutral |
+| 4 | Vivid |
+| 12 | Flat |
+
+Other indices are not yet mapped. `ExportData` carries the profile name in ASCII at bytes 24–39 (`AUTO`, `STANDARD`, `NEUTRAL`, `VIVID`, `FLAT`).
+
+**Active D-Lighting** lives in `nikon::ExposureSettings`:
+
+- `ApplyActiveDLightingFilter` changes from `false` to `true`;
+- `ActiveDLightingFilter` changes from `0` to `1` when set to Off.
+- The NEF maker notes say the camera shot with Active D-Lighting Off, so the default (`false`) means "same as shot".
+- The values for the other levels are not yet mapped.
+
+**`ExportData` layout (hypothesis from these samples).** Parameter records sit 10 bytes apart. Two value blocks are used, depending on the profile:
+
+| Bytes | Auto | Standard / Vivid / Neutral / Flat | Reading |
+|---|---|---|---|
+| 82 | 255 | 140 / 144 / 136 / 132 | Absolute values for fixed profiles. Byte 82 matches Sharpening 3.0 / 4.0 / 2.0 / 1.0 at 0.25 per step (unverified) |
+| 92 | 255 | 132 / 132 / 130 / 128 | Next fixed-profile parameter (unconfirmed) |
+| 102–132 | 255 | 128 | Further fixed-profile parameters at their neutral value |
+| 172–222 | 128 | 255 | Auto's relative adjustments (128 = 0). Contrast is byte 192. One Auto edit earlier changed 172, 182, 212, 222 |
+| 242 | 255 | 136 / 136 / 132 / 128 | Unknown fixed-profile parameter |
+| 52–53 | 2, 207 | differ per profile | Unknown; possibly an ID or checksum. Must be reproduced exactly when switching profiles |
+
+255 appears to mean "not used by this profile". Consequence for NICE:
+
+- Switching profile is **not** just changing the index. Both blocks, bytes 52–53 and the name must change together.
+- The safest method until bytes 52–53 are understood: copy a complete `ExportData` captured from NX Studio for that profile, then apply adjustments.
+
 ## 5. Write tests (NICE → NX Studio)
 
 | File | Written by NICE | Result in NX Studio |
@@ -85,7 +131,7 @@ Active by default on this unedited NEF (17): `nikon::PictureControl`, `nikon::Qu
 
 ## 8. Still open
 
-- Remaining Picture Control parameters (sharpening, clarity, saturation, hue, brightness, quick sharp, filter effects) and their per-profile ranges (Q-017).
+- Meaning of each `ExportData` record and of bytes 52–53 (§4.1); remaining Picture Control parameters (sharpening, clarity, saturation, hue, brightness, quick sharp, filter effects) and their per-profile ranges (Q-017).
 - Remaining white-balance bytes; tint/fine-tune semantics; other WB modes (cloudy, incandescent, Kelvin, preset).
 - Color label values (`nine:Label`).
 - Behavior with other NX Studio versions, Windows builds, and Capture NX-D.
